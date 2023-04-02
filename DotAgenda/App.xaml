@@ -1,0 +1,98 @@
+﻿<Application x:Class="DotAgenda.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DotAgenda"
+             xmlns:viewModel="clr-namespace:DotAgenda.ViewModels"
+             xmlns:view="clr-namespace:DotAgenda.View"
+             xmlns:viewPopup="clr-namespace:DotAgenda.View.Popups"
+             Startup="ApplicationStart">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
+
+
+                <ResourceDictionary Source="Ressource/StaticResources.xaml"/>
+                
+                <ResourceDictionary Source="Ressource/Radio/RadioButtonMain.xaml"/>
+                <ResourceDictionary Source="Ressource/Radio/RadioButtonCheckBox.xaml"/>
+                <ResourceDictionary Source="Ressource/Radio/TodoCheckBox.xaml"/>
+                <ResourceDictionary Source="Ressource/Radio/ImgRadioBTN.xaml"/>
+                <ResourceDictionary Source="Ressource/Radio/CheckBoxBasique.xaml"/>
+                <ResourceDictionary Source="Ressource/Radio/RadioButtonDiscret.xaml"/>
+                <ResourceDictionary Source="Ressource/Radio/RadioButtonMenu.xaml"/>
+                
+                <ResourceDictionary Source="Ressource/BorderDrop.xaml"/>
+
+                <ResourceDictionary Source="Ressource/List/ListeViewPetitJours.xaml"/>
+                <ResourceDictionary Source="Ressource/List/NumPetitsJours.xaml"/>
+                <ResourceDictionary Source="Ressource/List/ContainerStyleList.xaml"/>
+                <ResourceDictionary Source="Ressource/List/StyleScrollBar.xaml"/>
+                
+                <ResourceDictionary Source="Ressource/SearchBox.xaml"/>
+                <ResourceDictionary Source="Ressource/DatePickerCustom.xaml"/>
+                <ResourceDictionary Source="Ressource/TextBoxForm.xaml"/>
+                
+                <ResourceDictionary Source="Ressource/DotTextBlock.xaml"/>
+
+                <ResourceDictionary Source="Ressource/AddEvent/ComboBox.xaml"/>
+                <ResourceDictionary Source="Ressource/AddEvent/ComboBoxItem.xaml"/>
+                <ResourceDictionary Source="Ressource/AddEvent/ColorPicker.xaml"/>
+                
+                
+                <ResourceDictionary Source="Ressource/Calendar/CalendarCustom.xaml"/>
+                <ResourceDictionary Source="Ressource/Calendar/CalendarDaySpeCustom.xaml"/>
+                
+                <ResourceDictionary Source="Ressource/btn/BoutonsImg_Plus.xaml"/>
+                <ResourceDictionary Source="Ressource/btn/ProfilBtn.xaml"/>
+                <ResourceDictionary Source="Ressource/btn/BasiqueBtn.xaml"/>
+                <ResourceDictionary Source="Ressource/btn/BasiqueBtnPoint.xaml"/>
+                <ResourceDictionary Source="Ressource/btn/BtnMoreEvent.xaml"/>
+                <ResourceDictionary Source="Ressource/btn/BoutonsGraph.xaml"/>
+                <ResourceDictionary Source="Ressource/btn/BouttonsWeek+-.xaml"/>
+                <ResourceDictionary Source="Ressource/btn/BouttonsImg.xaml"/>
+                
+                <ResourceDictionary Source="Ressource/ContextMenu/ContextMenuItemMod.xaml"/>
+                <ResourceDictionary Source="Ressource/ContextMenu/ContextMenuStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate DataType="{x:Type viewModel:HomeViewModel}">
+                <view:HomeView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModel:SecondViewModel}">
+            <view:SecondView/>
+        </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModel:ThirdViewModel}">
+                <view:ThirdView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModel:HomeViewModel_Day}">
+            <view:HomeView_Day/>
+        </DataTemplate>
+            
+        <DataTemplate DataType="{x:Type viewModel:HomeViewModel_Week}">
+            <view:HomeView_Week/>
+        </DataTemplate>
+            
+        <DataTemplate DataType="{x:Type viewModel:HomeViewModel_Month}">
+            <view:HomeView_Month/>
+        </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModel:DialogEventViewModel_Tache}">
+                <viewPopup:DialogEvent_Tache/>
+        </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModel:DialogEventViewModel_Evenement}">
+                <viewPopup:DialogEvent_Evenement/>
+        </DataTemplate>
+            
+         
+        </ResourceDictionary>
+    </Application.Resources>
+    
+</Application>

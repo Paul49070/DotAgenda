@@ -1,0 +1,184 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf">
+    <!--<Style BasedOn="{StaticResource {x:Type ToggleButton}}"
+           TargetType="{x:Type RadioButton}"
+           x:Key="BoutonsMenu">
+        <Style.Setters>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border Background="{TemplateBinding Background}"  CornerRadius="10">
+                            <Grid HorizontalAlignment="stretch" VerticalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Background="Transparent" Grid.Column="1"  CornerRadius="10" Margin="15,0,10,0">
+                                    <Image Margin="8,5" Source="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}" Width="24" Height="24"/>
+                                </Border>
+
+                                <TextBlock Grid.Column="2" Background="Transparent" HorizontalAlignment="Stretch" 
+                                       Text="{TemplateBinding Tag}" FontSize="15" Foreground="{TemplateBinding Foreground}" 
+                                       VerticalAlignment="Center" FontFamily="/Font/#Poppins" Margin="5,0,7,0"/>
+
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource Font}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Secondary}"/>
+        </Style.Setters>
+
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource Contrast}"/>
+            </Trigger>
+
+    
+        </Style.Triggers>
+    </Style>-->
+
+    <Style BasedOn="{StaticResource {x:Type ToggleButton}}"
+           TargetType="{x:Type RadioButton}"
+           x:Key="BoutonsMenu">
+        <Style.Setters>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border Background="{TemplateBinding Background}"  CornerRadius="10">
+                            <Grid HorizontalAlignment="stretch" VerticalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Background="Transparent" Grid.Column="1"  CornerRadius="10" Margin="15,0,10,0">
+                                    <wpf:PackIcon Margin="7,5" Kind="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}" Width="26" Height="26" Foreground="{TemplateBinding Foreground}" />
+                                </Border>
+
+                                <TextBlock Grid.Column="2" Background="Transparent" HorizontalAlignment="Stretch" 
+                                       Text="{TemplateBinding Tag}" FontSize="15" Foreground="{TemplateBinding Foreground}" 
+                                       VerticalAlignment="Center" FontFamily="/Font/#Poppins" Margin="10,0,7,2"/>
+
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource Font}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Secondary}"/>
+        </Style.Setters>
+
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <!--<Setter Property="Background" Value="{DynamicResource Contrast_Opacity}"/>-->
+                <Setter Property="Foreground" Value="{DynamicResource Contrast}"/>
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsMouseOver" Value="True"/>
+                    <Condition Property="IsChecked" Value="False"/>
+                </MultiTrigger.Conditions>
+                <MultiTrigger.Setters>
+                    <Setter Property="Foreground" Value="{DynamicResource Font_Grey}"/>
+                </MultiTrigger.Setters>
+            </MultiTrigger>
+
+
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="CheckBox" x:Key="DevelopBTN">
+        <Setter Property="Cursor" Value="Hand"></Setter>
+        <Setter Property="Content" Value=""></Setter>
+        <Setter Property="FontFamily" Value="/Font/#Poppins"/>
+        <Setter Property="Margin" Value="0,5,0,5"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource Font}"/>
+        <Setter Property="FontFamily" Value="/Font/#Poppins"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="Margin" Value="0,5,0,5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Border Background="{TemplateBinding Background}"  CornerRadius="10">
+                        <Grid HorizontalAlignment="stretch" VerticalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Background="Transparent"  CornerRadius="10">
+                                <wpf:PackIcon Margin="7,5" Kind="ChevronRight" x:Name="icon" Width="26" Height="26"/>
+                            </Border>
+
+                            <ContentPresenter Grid.Column="1" x:Name="content" Margin="15,0,0,5" Content="{TemplateBinding Tag}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource Font_Grey}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Kind" TargetName="icon" Value="chevronLeft"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="CheckBox" x:Key="DayNightBTN">
+        <Setter Property="Cursor" Value="Hand"></Setter>
+        <Setter Property="Content" Value=""></Setter>
+        <Setter Property="FontFamily" Value="/Font/#Poppins"/>
+        <Setter Property="Margin" Value="0,5,0,5"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource Font}"/>
+        <Setter Property="FontFamily" Value="/Font/#Poppins"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="Margin" Value="0,5,0,5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Border Background="{TemplateBinding Background}"  CornerRadius="10">
+                        <Grid HorizontalAlignment="stretch" VerticalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Background="Transparent"  CornerRadius="10">
+                                <wpf:PackIcon Margin="7,5" Kind="weathersunny" x:Name="icon" Width="26" Height="26"/>
+                            </Border>
+
+                            <ContentPresenter Grid.Column="1" x:Name="content" Margin="15,0,0,5" Content="Mode jour" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource Font_Grey}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Kind" TargetName="icon" Value="weathernight"/>
+                            <Setter Property="Content" TargetName="content" Value="Mode nuit"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

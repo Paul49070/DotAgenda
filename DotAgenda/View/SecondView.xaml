@@ -1,0 +1,294 @@
+﻿<UserControl x:Class="DotAgenda.View.SecondView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"
+             xmlns:map="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
+             xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
+             xmlns:controls="clr-namespace:Microsoft.Toolkit.Wpf.UI.Controls;assembly=Microsoft.Toolkit.Wpf.UI.Controls"
+             xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
+             xmlns:local="clr-namespace:DotAgenda.View.Converter"
+             d:DesignHeight="550" d:DesignWidth="820">
+    <UserControl.Resources>
+        <ControlTemplate TargetType="{x:Type Button}" x:Key="btnstyle">
+            <Grid>
+                <Border Background="Transparent"
+                         BorderBrush="{TemplateBinding BorderBrush}"
+                         BorderThickness="{TemplateBinding BorderThickness}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+
+                        </Grid.RowDefinitions>
+
+                        <ContentPresenter HorizontalAlignment="Center"  Grid.Column="0" Grid.ColumnSpan="2"
+                                          VerticalAlignment="Top"/>
+                        <Canvas Background="Transparent" Grid.Column="1" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </ControlTemplate>
+
+        <Style TargetType="wpf:PackIcon" x:Key="wpfICON">
+            <Setter Property="Kind" Value="{Binding Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Border}}"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+        </Style>
+
+
+        <Style BasedOn="{StaticResource {x:Type Button}}"
+           TargetType="{x:Type Button}"
+           x:Key="BtnIconBIS">
+            <Style.Setters>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Foreground" Value="{DynamicResource Font}"/>
+                <Setter Property="Padding" Value="5"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontFamily" Value="/Font/#Poppins"/>
+                <Setter Property="Template">
+
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid HorizontalAlignment="stretch" VerticalAlignment="Stretch">
+                                <Border Background="Transparent" HorizontalAlignment="Center">
+                                    <wpf:PackIcon x:Name="text" Kind="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}" 
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center" Height="23" Width="23"  Foreground="{TemplateBinding Foreground}"/>
+                                </Border>
+                            </Grid>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" TargetName="text" Value="{DynamicResource Font_Grey}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+            </Style.Setters>
+        </Style>
+
+
+        <local:NbObjInArrayConverter x:Key="ConverterNbObj"/>
+        <local:FileToColor x:Key="ConverterFileToColor"/>
+        <local:FileToIcon x:Key="ConverterFileToIcon"/>
+        <local:FileToShortName x:Key="ConverterFileToShortName"/>
+    </UserControl.Resources>
+
+    <Grid Margin="0,10,0,20">
+
+        <Grid.Resources>
+            <Style TargetType="Border">
+                <Setter Property="HorizontalAlignment" Value="stretch"/>
+                <Setter Property="VerticalAlignment" Value="stretch"/>
+                <Setter Property="Background" Value="{DynamicResource Secondary}"/>
+                <Setter Property="BorderThickness" Value="0"/> <!--5-->
+                <Setter Property="BorderBrush" Value="{DynamicResource Tertiary}"/>
+                <Setter Property="CornerRadius" Value="20"/>
+            </Style>
+
+            <Style TargetType="Border" x:Key="StyleBorder">
+                <Setter Property="HorizontalAlignment" Value="stretch"/>
+                <Setter Property="VerticalAlignment" Value="stretch"/>
+                <Setter Property="Background" Value="{DynamicResource Secondary}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Tertiary}"/>
+                <Setter Property="CornerRadius" Value="20"/>
+            </Style>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="1.5*"/>
+
+        </Grid.ColumnDefinitions>
+        
+        <TextBlock Text="Fichier" Margin="25,0,70,0" x:Name="VueTXT"
+                       Foreground="{DynamicResource Font}" VerticalAlignment="Top"
+                           FontSize="25" Grid.Column="0" Grid.ColumnSpan="2"
+                           FontWeight="Bold"  Style="{DynamicResource numTXTjour}"/>
+
+        <Button Click="GetFile" Content="Ajouter" FontSize="12" Grid.Column="1" Style="{DynamicResource BasiqueBtn}"
+                HorizontalAlignment="Right" Margin="0,0,20,5"/>
+
+        <Border Grid.Row="1" 
+                Margin="0,0,20,0">
+            <Grid VerticalAlignment="Stretch" Margin="15,0,20,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Name="TitleFileList"
+                                 Text="Placeholder" Style="{DynamicResource DotTextBlock}"
+                                 FontSize="20" Background="{DynamicResource Contrast}" BorderThickness="3.5"
+                                 Padding="0,0,5,8" Margin="20,20,20,15" 
+                                 HorizontalAlignment="Left" VerticalAlignment="Top"  >
+                    </TextBox>
+
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Click="ChangeList" VerticalAlignment="center" HorizontalAlignment="Right" Margin="0,0,10,0" Content="history" Style="{DynamicResource BtnIcon}"/>
+
+                    </Grid>
+                </Grid>
+
+
+
+                <ScrollViewer  Margin="5,0,0,10" x:Name="scrollviewer" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                               Grid.Row="1" PreviewMouseWheel="DataGrid_PreviewMouseWheel"
+                               ScrollViewer.VerticalScrollBarVisibility="Auto" >
+                    <Border x:Name="BorderDrop" Style="{DynamicResource BorderDrop}">
+                        
+                        <ListView AllowDrop="True" Drop="DropFile" DragEnter="DragOn" DragLeave="DragOff"
+                           ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                           ScrollViewer.CanContentScroll="False"
+                           Padding="0,0,0,20"
+                           Name="ListeView_File" 
+                           BorderThickness="0" VerticalAlignment="Stretch"
+                           HorizontalContentAlignment="Stretch" ItemContainerStyle="{StaticResource containerStyle1}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Button x:Name="Item" Click="OpenFile" 
+                                    Style="{DynamicResource BasiqueBtnList}"
+                                    Background="Transparent" 
+                                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+                                    Height="auto">
+                                        <Border HorizontalAlignment="stretch" VerticalAlignment="Stretch" 
+                                        Background="{DynamicResource PopupBG}" CornerRadius="10">
+                                            
+                                            <Grid HorizontalAlignment="stretch" Margin="10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                
+                                                <Button x:Name="CloseBTN" Grid.Column="0" Visibility="Hidden" Width="0"
+                                                                    Style="{DynamicResource BtnIcon}" Content="close" MaxHeight="20" MaxWidth="20"
+                                                                    Foreground="{DynamicResource Font}" Margin="0" Click="DetachFile"/>
+                                                
+                                                
+                                                <TextBlock Padding="10" Focusable="False" Grid.Column="1"
+                                               FontFamily="/Font/#Poppins"
+                                               TextWrapping = "NoWrap" TextTrimming="WordEllipsis"
+                                               Text="{Binding Path=Nom, Converter={StaticResource ConverterFileToShortName}}"
+                                               Background="Transparent"
+                                               Foreground="{DynamicResource Font}"
+                                               HorizontalAlignment="Left"
+                                               VerticalAlignment="Center"
+                                               TextAlignment="left"
+                                               FontSize="12"/>
+
+                                                <wpf:PackIcon Grid.Column="2"
+                                                              Kind="{Binding Path=Nom, Converter={StaticResource ConverterFileToIcon}}" 
+                                                              Width="20" Height="20" 
+                                                              HorizontalAlignment="right" Margin="0,0,20,0"
+                                                              Foreground="{Binding Path=Nom, Converter={StaticResource ConverterFileToColor}}" 
+                                                              VerticalAlignment="Center" />
+                                            </Grid>
+                                            </Border>
+                                        </Button>
+                                    <DataTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <Setter Property="Visibility" TargetName="CloseBTN" Value="Visible"/>
+                                            <Setter Property="Width" TargetName="CloseBTN" Value="auto"/>
+                                            <Setter Property="Margin" TargetName="CloseBTN" Value="5,0,0,0"/>
+                                        </Trigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Border>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        
+
+
+        <ListView Grid.Row="1" Grid.Column="1"
+                  x:Name="FileBoxs" HorizontalAlignment="Stretch"  
+                  VerticalAlignment="Stretch" ItemContainerStyle="{DynamicResource containerStyle1}" 
+                  HorizontalContentAlignment="Stretch"
+                  VerticalContentAlignment="Stretch">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Button Click="ChangeList" Style="{DynamicResource BasiqueBtnList}"  Height="auto" 
+                            VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Transparent">
+                        <Border Style="{DynamicResource StyleBorder}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Margin="20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="auto"/>
+                                    </Grid.ColumnDefinitions>
+
+
+                                    <Border Style="{DynamicResource Icon}"  
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Left" CornerRadius="20"
+                                            Background="Transparent" 
+                                            Tag="{Binding Icon}">
+                                        <wpf:PackIcon Foreground="{Binding Couleur}" Style="{DynamicResource wpfICON}" Margin="8"/>
+                                    </Border>
+
+                                    <Button Style="{DynamicResource BtnIconBIS}" Content="dotshorizontal" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,0,0"/>
+
+                                </Grid>
+
+                                <StackPanel Grid.Row="1" Margin="30,0,30,20">
+
+                                    <TextBox Focusable="False"
+                                Text="{Binding Titre}" Style="{DynamicResource DotTextBlock}"
+                                 FontSize="20" Background="{Binding Couleur}" BorderThickness="3.5"
+                                 Padding="0,0,5,8" VerticalAlignment="Top"  >
+                                    </TextBox>
+
+                                    <TextBlock FontSize="12" FontFamily="/Font/#Poppins"
+                                       Foreground="{DynamicResource Font_Grey}">
+                                        <TextBlock.Text>
+                                            <Binding Path="ListeFichiers" Converter="{StaticResource ConverterNbObj}" StringFormat="{}{0} fichiers" />
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+
+
+                            </Grid>
+                        </Border>
+                    </Button>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="2" Rows="3"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+        </ListView>
+    </Grid>
+</UserControl>

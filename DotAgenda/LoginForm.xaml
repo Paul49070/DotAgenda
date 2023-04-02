@@ -1,0 +1,266 @@
+﻿<Window x:Class="DotAgenda.LoginForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DotAgenda"
+        xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d" AllowsTransparency="True" 
+        MouseLeftButtonUp="Window_MouseLeftButtonUp"
+        WindowStartupLocation="CenterScreen" 
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        Loaded="Window_Loaded"
+        ResizeMode="NoResize" x:Name="LoginFormXML"
+        WindowStyle="None" Background="Transparent"
+        Title="LoginForm" Width="400" Height="500" Left="0">
+    <!--
+    <Window.RenderTransform>
+        <ScaleTransform ScaleX="0.5" ScaleY="0.5" x:Name="MyRenderScaleTransform"/>
+    </Window.RenderTransform>
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <EventTrigger.Actions>
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.Target="{Binding ElementName=MyRenderScaleTransform}"
+                                         Storyboard.TargetProperty="(ScaleTransform.ScaleX)"
+                                         From="0" To="1" Duration="0:0:2">
+                            <DoubleAnimation.EasingFunction>
+                                <BackEase/>
+                            </DoubleAnimation.EasingFunction>
+                        </DoubleAnimation>
+                        <DoubleAnimation Storyboard.Target="{Binding ElementName=MyRenderScaleTransform}"
+                                         Storyboard.TargetProperty="(ScaleTransform.ScaleY)"
+                                         From="0" To="1" Duration="0:0:2">
+                            <DoubleAnimation.EasingFunction>
+                                <BackEase/>
+                            </DoubleAnimation.EasingFunction>
+                        </DoubleAnimation>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger.Actions>
+        </EventTrigger>
+    </Window.Triggers>-->
+    
+    <Border Background="{DynamicResource bg}" CornerRadius="20" BorderThickness="0" x:Name="Contener">
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="220"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Button HorizontalAlignment="Right" VerticalAlignment="Top" Content="x" FontSize="16" FontFamily="/Font/#Poppins" 
+                    Margin="15,15,20,15" Click="CloseLogin" Style="{DynamicResource BasiqueBtn}"/>
+
+            <StackPanel MaxWidth="300" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="." HorizontalAlignment="Center" FontSize="30" FontWeight="Bold" FontFamily="/Font/#Poppins"
+                       Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Contrast}"
+                       Margin="0,40,0,0"/>
+
+                    <TextBlock Text="agenda" HorizontalAlignment="Center" FontSize="30" FontWeight="Bold" FontFamily="/Font/#Poppins"
+                       Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font}"
+                       Margin="5,40,20,0"/>
+                </StackPanel>
+                <TextBlock Text="Connectez-vous ou inscrivez-vous pour accéder à votre compte" HorizontalAlignment="Center" FontSize="13" 
+                       Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font_Grey}" TextWrapping="Wrap" TextAlignment="Center"
+                       Margin="20,10,20,10"/>
+                <TextBlock Text="Mauvais mail ou mot de passe" HorizontalAlignment="Center" FontSize="13" 
+                       Style="{DynamicResource numTXTjour}" Foreground="IndianRed" TextWrapping="Wrap" TextAlignment="Center"
+                       Margin="20,0,20,0" x:Name="WrongIDTXT" Visibility="Hidden"/>
+
+            </StackPanel>
+
+
+
+
+            <StackPanel Grid.Row="1" Margin="40,20" x:Name="Connection" Visibility="Visible" VerticalAlignment="Center">
+                <TextBox Style="{DynamicResource MaterialDesignTextBox}" Tag=""  x:Name="MailTXT2" Margin="0,10,0,30" 
+                         materialDesign:HintAssist.Hint="Mail" BorderBrush="{DynamicResource Tertiary}" 
+                         BorderThickness="0,0,0,2" Padding="10" FontSize="16" Foreground="{DynamicResource Font}"
+                         HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins"
+                         materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource Contrast}"
+                         TextChanged="MailTXT2_TextChanged"/>
+
+                <PasswordBox Panel.ZIndex="2" VerticalAlignment="Stretch"  Margin="0,0,0,10"
+                             Name="mdpTXT" Background="Transparent" Foreground="{DynamicResource Font}" BorderBrush="{DynamicResource Tertiary}" BorderThickness="0,0,0,2"
+                             materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource Contrast}"        
+                             PasswordChar="•" Style="{DynamicResource MaterialDesignRevealPasswordBox}" Padding="10" FontSize="16" PasswordChanged="mdpTXT_PasswordChanged" Password="" materialDesign:HintAssist.Hint="Mot de passe"></PasswordBox>
+                
+                <!--<DatePicker Style="{DynamicResource MaterialDesignDatePicker}" FontSize="16"  BorderBrush="{DynamicResource Tertiary}" BorderThickness="0,0,0,2">
+                   
+                </DatePicker>-->
+                <!--<Grid>
+                    <Border BorderBrush="{DynamicResource Tertiary}" x:Name="BorderPassword1"
+                            BorderThickness="2" CornerRadius="5" Margin="0,10,0,10" HorizontalAlignment="Stretch" Cursor="IBeam">
+                        <Grid>
+                            <PasswordBox Panel.ZIndex="2" VerticalAlignment="Stretch" Name="mdpTXT" Background="Transparent" Foreground="{DynamicResource Font}"
+                                     PasswordChar="•" Style="{DynamicResource MaterialDesignRevealPasswordBox}" Padding="10" BorderThickness="0" FontSize="16" PasswordChanged="mdpTXT_PasswordChanged" Password=""></PasswordBox>
+
+
+                            <TextBox Focusable="False"
+                                     FontFamily="/Font/#Poppins"
+                                     VerticalAlignment="Stretch"
+                                     TextAlignment="Left"
+                                     HorizontalAlignment="Stretch"
+                                     Text="Mot de passe"
+                                     BorderThickness="0"
+                                     Foreground="{DynamicResource Font_Grey}"
+                                     Padding="10"
+                                     Background="Transparent"
+                                     Margin="1"
+                                     Panel.ZIndex="1"
+                                     x:Name="textSourceMDP" />
+                        </Grid>
+                    </Border>
+                </Grid>-->
+
+
+
+                <TextBlock Text="Mot de passe oublié ?" HorizontalAlignment="Center" FontSize="11" 
+                       Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font_Grey}" TextWrapping="Wrap" TextAlignment="Center"
+                       Margin="20,10,20,0"/>
+                <CheckBox Style="{DynamicResource CheckBoxBasique}" Content="Rester connecté ?" HorizontalAlignment="Center" FontSize="11" 
+                       Foreground="{DynamicResource Font}" IsChecked="True" x:Name="CheckBoxResterConnecter"
+                       Margin="20,10,20,10"/>
+
+            </StackPanel>
+
+
+
+
+
+
+            <!--Inscription-->
+
+
+
+
+
+            <StackPanel Grid.Row="1" Margin="40,20,40,0" x:Name="Inscription" Visibility="Hidden" VerticalAlignment="Center">
+
+                <Grid>
+                    
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    
+                    
+                    <TextBox Style="{DynamicResource MaterialDesignTextBox}" Tag=""  x:Name="PrenomTXT" Margin="0,10,10,10" 
+                         materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource Contrast}"
+                         materialDesign:HintAssist.Hint="Prenom" BorderBrush="{DynamicResource Tertiary}" 
+                         BorderThickness="0,0,0,2" Padding="10" FontSize="14" Foreground="{DynamicResource Font}"
+                         HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins"/>
+
+                    <TextBox Style="{DynamicResource MaterialDesignTextBox}" Tag=""  x:Name="NomTXT" Margin="10,10,0,10" 
+                         materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource Contrast}"
+                         materialDesign:HintAssist.Hint="Nom" BorderBrush="{DynamicResource Tertiary}" 
+                         BorderThickness="0,0,0,2" Padding="10" FontSize="14" Foreground="{DynamicResource Font}"
+                         HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins" Grid.Column="1"/>
+
+                    <!--<TextBox Style="{DynamicResource TextBoxForm}" Tag="Prenom"  
+                             Margin="5,10" HorizontalAlignment="Stretch" Cursor="IBeam" 
+                             Grid.Column="0" x:Name="PrenomTX"/>
+                    <TextBox Style="{DynamicResource TextBoxForm}" Tag="Nom"  
+                             Margin="0,10,0,10" HorizontalAlignment="Stretch" 
+                             Cursor="IBeam" Grid.Column="1" x:Name="NomTXT"/>-->
+                </Grid>
+
+                <Border BorderBrush="{DynamicResource Tertiary}" Margin="0,10,0,10" x:Name="BorderMail" HorizontalAlignment="Stretch" BorderThickness="0" CornerRadius="5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="48"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Style="{DynamicResource MaterialDesignTextBox}" x:Name="MailTXT" Margin="0,10,48,10" 
+                         materialDesign:HintAssist.Hint="Mail" BorderBrush="{DynamicResource Tertiary}" 
+                         BorderThickness="0,0,0,2" Padding="10" FontSize="16" Foreground="{DynamicResource Font}"
+                         HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins" Grid.ColumnSpan="2"
+                         TextChanged="MailTXT_TextChanged" materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource Contrast}"/>
+
+                     
+                        <Grid Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,8,0">
+                            <Border Background="{DynamicResource bg}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="11,0,0,15"/>
+                            <Image x:Name="CorrectImgMailCross" Visibility="Hidden" Source="/Img/IconEvent/x-circle.png" Width="20" Height="20">
+                                <ToolTipService.ToolTip>
+                                    <ToolTip Placement="Bottom" x:Name="ToolTipImgMail"
+                                         Background="Transparent" BorderBrush="Transparent">
+                                        <Grid>
+                                            <Border Background="{DynamicResource Secondary}" Margin="10" CornerRadius="6" BorderThickness="0" BorderBrush="{DynamicResource Tertiary}">
+                                                <StackPanel Margin="10">
+                                                    <TextBlock Text="Format invalide" FontSize="12" Foreground="Red"/>
+                                                    <TextBlock Text="username@domain.abc" FontSize="12" Foreground="{DynamicResource Font_Grey}"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </ToolTip>
+                                </ToolTipService.ToolTip>
+                            </Image>
+                            <Image x:Name="CorrectImgMailCheck" Visibility="Hidden" Source="/Img/IconEvent/check-circle.png" Width="20" Height="20"/>
+
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <PasswordBox VerticalAlignment="Stretch" Name="mdpTXT2" Background="Transparent" Foreground="{DynamicResource Font}" BorderBrush="{DynamicResource Tertiary}" BorderThickness="0,0,0,2"
+                              materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource Contrast}"
+                             PasswordChar="•" Style="{DynamicResource MaterialDesignRevealPasswordBox}" Padding="10" FontSize="16" PasswordChanged="mdpTXT2_PasswordChanged" Password="" materialDesign:HintAssist.Hint="Mot de passe"></PasswordBox>
+
+
+
+
+            </StackPanel>
+
+
+            <!--BTN-->
+
+
+            <Grid Grid.Row="2" VerticalAlignment="Center">
+
+
+
+                <StackPanel VerticalAlignment="Center" x:Name="PasDeCompte">
+
+
+                    <Button Style="{DynamicResource BtnForm}" Margin="0,0,0,0" VerticalAlignment="Center" Height="auto" Width="auto" 
+                    HorizontalAlignment="Center" Content="Se connecter" Click="LoginSubmit" FontSize="14"/>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                           HorizontalAlignment="Center">
+                        <TextBlock Text="Pas de compte ?" VerticalAlignment="Center" Foreground="{DynamicResource Font_Grey}"
+                           HorizontalAlignment="Center" Style="{DynamicResource numTXTjour}"
+                           FontSize="12"/>
+                        <Button Style="{DynamicResource BasiqueBtn}" Margin="0,0,0,0" VerticalAlignment="Center" Height="auto" Width="auto" 
+                    HorizontalAlignment="Center" Content="Inscrivez-vous" FontSize="11" Click="InscriptionClick"/>
+                    </StackPanel>
+                </StackPanel>
+
+
+
+
+                <StackPanel VerticalAlignment="Center"  x:Name="DejaUnCompte" Visibility="Hidden">
+                    <Button Style="{DynamicResource BtnForm}" Margin="0,0,0,0" VerticalAlignment="Center" Height="auto" Width="auto" 
+                    HorizontalAlignment="Center" Content="S'inscrire" Click="AddUserEvent" FontSize="14"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                           HorizontalAlignment="Center">
+                        <TextBlock Text="Déjà un compte ?" VerticalAlignment="Center" Foreground="{DynamicResource Font_Grey}"
+                           HorizontalAlignment="Center" Style="{DynamicResource numTXTjour}"
+                           FontSize="11"/>
+                        <Button Style="{DynamicResource BasiqueBtn}" Margin="0" VerticalAlignment="Center" Height="auto" Width="auto" 
+                    HorizontalAlignment="Center" Content="Connectez-vous" FontSize="11" Click="ConnectionClick"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+
+        </Grid>
+    </Border>
+
+</Window>
