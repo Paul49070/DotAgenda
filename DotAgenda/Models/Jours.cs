@@ -65,9 +65,9 @@ namespace DotAgenda.Models
 
             EventAdd.Fini = _prim.Event_Fini(EventAdd.DateDebut);
 
-            EventAdd.ID = _db.Event.AddEventToDB(EventAdd);
+            bool HasBeenAdded = _db.Event.AddEventToDB(EventAdd);
 
-            if (EventAdd.ID != -1)
+            if (HasBeenAdded)
             {
                 if (AddEventToList(EventAdd))
                 {

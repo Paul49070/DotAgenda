@@ -32,7 +32,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
 
         public void InitProfil()
         {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
+            SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path);
             connection.Open();
 
             string requete = "SELECT * from Profil WHERE ID=@id";
@@ -93,7 +93,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
         {
             List<ClasseEvent_item> Classe = new List<ClasseEvent_item>();
 
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
+            SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path);
             connection.Open();
             SQLiteCommand command = new SQLiteCommand(connection);
 
@@ -138,7 +138,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
         {
             string requete = "UPDATE Profil SET LightMode = @light";
 
-            SQLiteConnection c = new SQLiteConnection(App.DB_Path);
+            SQLiteConnection c = new SQLiteConnection(App.SystemDB_Path);
             c.Open();
 
             //Ajout dans base de donnée

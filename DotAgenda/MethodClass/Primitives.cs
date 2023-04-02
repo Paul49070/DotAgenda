@@ -3,6 +3,7 @@ using DotAgenda.Models;
 using DotAgenda.View.Popups;
 using Microsoft.SqlServer.Management.Smo;
 using System;
+using System.Security.Cryptography;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -26,6 +27,19 @@ namespace DotAgenda.MethodClass
         private Primitives()
         {
 
+        }
+
+        public string CryptPassword(string password)
+        {
+            string cryptedPassword = "";
+            return cryptedPassword;
+        }
+
+        public string GenerateID()
+        {
+            Guid myuuid = Guid.NewGuid();
+
+            return myuuid.ToString();
         }
 
         public EventDay SearchNextEvent(int delai, DateTime Date)
@@ -96,46 +110,16 @@ namespace DotAgenda.MethodClass
 
         public Fichier CreateFile(string nomFichier)
         {
-            int fileID = _db.File.GetFileID(nomFichier);
+            string fileID = GenerateID();
+            Fichier ficAdded = new Fichier(fileID, nomFichier);
 
-            Fichier fichier = new Fichier();
-
-            fichier.ID = fileID;
-
-            if (fileID == -1)
+            if (_db.File.AddFileToDB(ficAdded))
             {
-                _db.File.AddFileToDB(nomFichier);
-                fileID = _db.File.GetFileID(nomFichier);
-
-                fichier.Nom = nomFichier;
-                fichier.Contenu = "null";
-                fichier.DateAjout = DateTime.Today;
-
-                FileInfo fi = new FileInfo(fichier.Nom);
-
-                try
-                {
-                    fichier.Type = _dict.ExtensionDict[fi.Extension];
-                }
-
-                catch
-                {
-                    fichier.Type = _dict.ExtensionDict["null"];
-                }
-
-                fichier.ID = fileID;
-
-                fichier.AddToFolderType();
-                _global.ListeFichiers.Add(fichier);
-
-                return fichier;
+                ficAdded.AddToFolderType();
+                _global.ListeFichiers.Add(ficAdded);
             }
 
-            else
-            {
-                fichier.Type = null;
-                return fichier;
-            }
+            return ficAdded;
         }
 
 

@@ -106,8 +106,6 @@ namespace DotAgenda
 
                     App.ID = int.Parse(reader["ID"].ToString());
 
-                    App.DB_Path = "Data Source =" + @"UserDataBase/" + App.ID.ToString() + "_DataBase.db";
-
                     DialogResult = true;
                 }
             }
@@ -141,8 +139,6 @@ namespace DotAgenda
                 UserFinded = true;
                 WrongIDTXT.Visibility = Visibility.Hidden;           
                 App.ID = Convert.ToInt32(reader["ID"]);
-                App.DB_Path = "Data Source =" + @"UserDataBase/" + App.ID.ToString() + "_DataBase.db";
-
             }
 
             if (UserFinded)
@@ -240,10 +236,9 @@ namespace DotAgenda
 
             //On récupère toutes les infos
 
-            while (reader2.Read())
+            if(reader2.Read())
             {   
-                App.ID = Convert.ToInt32(reader2["ID"]);
-                App.DB_Path = "Data Source =" + @"UserDataBase/" + App.ID.ToString() + "_DataBase.db";
+                App.ID = int.Parse(reader2["ID"].ToString());
             }
 
             UpdateConnectionDB();

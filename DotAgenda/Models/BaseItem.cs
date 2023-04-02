@@ -57,15 +57,15 @@ namespace DotAgenda.Models
         }
 
 
-        private int _ID;
-        public int ID
+        private string _ID;
+        public string ID
         {
             get { return _ID; }
             set { _ID = value; }
         }
 
 
-        public BaseItem(int ID, string titre, DateTime debut, DateTime fin, string description = "", string classe = "", bool fini = false)
+        public BaseItem(string ID, string titre, DateTime debut, DateTime fin, string description = "", string classe = "", bool fini = false)
         {
             this.ID = ID;
             DateDebut = debut;

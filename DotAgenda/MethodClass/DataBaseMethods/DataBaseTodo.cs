@@ -47,8 +47,8 @@ namespace DotAgenda.MethodClass.DataBaseMethods
 
                     TodoFini, 
 
-                    int.Parse(reader["ID"].ToString())
-                    );
+                    reader["ID"].ToString()
+                );
 
                 int index;
 
@@ -87,27 +87,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
 
             command.ExecuteNonQuery();
 
-            //On récupère l'id
-
-            SQLiteCommand CommandGetID = new SQLiteCommand(connection);
-            CommandGetID.CommandText = "SELECT ID FROM Todo WHERE (Titre = @titre and Projet = @projet and Date = @date)";
-
-            p1 = new SQLiteParameter("titre", TodoAdd.Titre);
-            p2 = new SQLiteParameter("projet", TodoAdd.Classe);
-            p3 = new SQLiteParameter("date", TodoAdd.DateDebut);
-
-            CommandGetID.Parameters.Add(p1);
-            CommandGetID.Parameters.Add(p2);
-            CommandGetID.Parameters.Add(p3);
-
-            SQLiteDataReader reader = CommandGetID.ExecuteReader();
-
-            while (reader.Read())
-            {
-                TodoAdd.ID = int.Parse(reader["ID"].ToString());
-            }
-            if (TodoAdd.ID != -1)
-                _global.A[TodoAdd.DateDebut.Year - DateTime.Today.Year + 1].M[TodoAdd.DateDebut.Month - 1].J[TodoAdd.DateDebut.Day - 1].AjouterTodoToList(_prim.FindTodoIndex(TodoAdd), TodoAdd);
+            _global.A[TodoAdd.DateDebut.Year - DateTime.Today.Year + 1].M[TodoAdd.DateDebut.Month - 1].J[TodoAdd.DateDebut.Day - 1].AjouterTodoToList(_prim.FindTodoIndex(TodoAdd), TodoAdd);
 
             return TodoAdd;
         }

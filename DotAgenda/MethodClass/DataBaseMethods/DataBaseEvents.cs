@@ -27,140 +27,119 @@ namespace DotAgenda.MethodClass.DataBaseMethods
 
         public void InitEvent()
         {
-
-            string titre, classe, description, loc ;
-            DateTime debut, fin;
-            int ID;
-
-            //Connection base de donnée
-
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            command.CommandText = "SELECT * FROM Evenement";
-            SQLiteDataReader reader = command.ExecuteReader();
-
-            //On récupère toutes les infos
-
-            int numY;
-
-            while (reader.Read())
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
             {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Evenement UserID = @userID", connection))
+                {
+                    command.Parameters.AddWithValue("userID", App.User.id);
 
-                //assigns year, month, day, hour, min, seconds
+                    int numY;
+                    string titre, classe, description, loc, ID;
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ID = reader.GetString(1);
+                            titre = reader.GetString(2);
+                            classe = reader.GetString(3);
+                            description = reader.GetString(4);
+                            loc = reader.GetString(5);
 
-                description = reader["Description"].ToString();
-                loc = reader["Localisation"].ToString();
+                            if (DateTime.TryParse(reader.GetString(6), out DateTime debut) && DateTime.TryParse(reader.GetString(7), out DateTime fin))
+                            {
+                                numY = debut.Year - DateTime.Today.Year + 1;
 
-                debut = DateTime.Parse(reader["DateDebut"].ToString());
-                fin = DateTime.Parse(reader["DateFin"].ToString());
-
-                classe = reader["Classe"].ToString();
-
-                titre = reader["Titre"].ToString();
-
-                ID = int.Parse(reader["ID"].ToString());
-
-                //On ajoute un speDay pour ce jour (pastille calendrier)
-
-                numY = debut.Year - DateTime.Today.Year + 1;
-
-                _global.A[numY].M[debut.Month - 1].J[debut.Day - 1].AddEventToList(new EventDay(ID, titre, debut, fin, loc, description, classe));
-
-
-                int i = _dict.DictClasse.Keys.ToList().IndexOf(classe);
-                //Classe[i].Add(A[numY].M[debut.Month - 1].J[debut.Day - 1].ListeEvent[index]);
+                                _global.A[numY].M[debut.Month - 1].J[debut.Day - 1].AddEventToList(new EventDay(ID, titre, debut, fin, loc, description, classe));
+                            }
+                        }
+                    }
+                }
             }
-
-            connection.Close();
         }
 
 
-        public EventDay GetEventWithID(int ID)
+        public EventDay GetEventWithID(string ID)
         {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            //Ajout dans base de donnée
-
-            command.CommandText = "SELECT * FROM Evenement WHERE ID = @id";
-
-            SQLiteParameter p1 = new SQLiteParameter("id", ID);
-
-            command.Parameters.Add(p1);
-
-            SQLiteDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
             {
-                EventDay e = new EventDay(-1,
-                reader["Titre"].ToString(),
-                DateTime.Parse(reader["DateDebut"].ToString()),
-                DateTime.Parse(reader["DateFin"].ToString()),
-                "", "",
-                reader["Classe"].ToString());
-
-                int year = e.DateDebut.Year - DateTime.Today.Year + 1;
-
-
-                foreach (EventDay temp in _global.A[year].M[e.DateDebut.Month - 1].J[e.DateDebut.Day - 1].ListeEvent)
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT DateDebut, DateFin FROM Evenement WHERE ID = @id and UserID = @userID", connection))
                 {
-                    if (temp.Titre == e.Titre && temp.Classe == e.Classe && temp.DateDebut == e.DateDebut && temp.DateFin == e.DateFin)
-                        return temp;
+                    command.Parameters.AddWithValue("userID", App.User.id);
+                    command.Parameters.AddWithValue("id", ID);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            if (DateTime.TryParse(reader.GetString(0), out DateTime start) && DateTime.TryParse(reader.GetString(1), out DateTime end))
+                            {
+
+                                int year = start.Year - DateTime.Today.Year + 1;
+                                foreach (EventDay eventDay in _global.A[year].M[start.Month - 1].J[start.Day - 1].ListeEvent)
+                                {
+                                    if (eventDay.ID == ID)
+                                        return eventDay;
+                                }
+                            }
+                        }
+                    }
+
+                    return null;
                 }
             }
-
-            return null;
         }
 
 
         public void InitFileEvent()
         {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            //Ajout dans base de donnée
-
-            command.CommandText = "SELECT * FROM FileEvent";
-
-            SQLiteDataReader reader = command.ExecuteReader();
-            int ID_event, ID_file;
-            while (reader.Read())
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
             {
-                ID_event = int.Parse(reader["IDevent"].ToString());
-                ID_file = int.Parse(reader["IDfile"].ToString());
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM FileEvent WHERE UserID = @userID", connection))
+                {
+                    command.Parameters.AddWithValue("userID", App.User.id);
 
-                EventDay e = GetEventWithID(ID_event);
-                Fichier f = _db.File.GetFileWithID(ID_file);
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        string ID_event, ID_file;
 
-                if (e.Titre != null && f.Nom != null)
-                    e.AddFile(f);
+                        while (reader.Read())
+                        {
+                            ID_event = reader["IDevent"].ToString();
+                            ID_file = reader["IDfile"].ToString();
+
+                            EventDay e = GetEventWithID(ID_event);
+                            Fichier f = _db.File.GetFileWithID(ID_file);
+
+                            if (e.Titre != null && f.Nom != null)
+                                e.AddFile(f);
+                        }
+                    }
+                }
             }
         }
 
-
-
         public void ModifEvent(EventDay nvx)
         {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-
-            command.CommandText = "UPDATE Evenement Set Classe = @classe, Titre = @titre, DateDebut = @debut, DateFin = @fin, Description = @description, Localisation = @loc WHERE ID = @id";
-
-            command.Parameters.AddWithValue("titre", nvx.Titre);
-            command.Parameters.AddWithValue("classe", nvx.Classe);
-            command.Parameters.AddWithValue("debut", nvx.DateDebut.ToString());
-            command.Parameters.AddWithValue("fin", nvx.DateFin.ToString());
-            command.Parameters.AddWithValue("id", nvx.ID);
-            command.Parameters.AddWithValue("description", nvx.Description);
-            command.Parameters.AddWithValue("loc", nvx.Lieu);
-
-            command.ExecuteNonQuery();
+            using(var connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("UPDATE Evenement Set Classe = @classe, Titre = @titre, DateDebut = @debut, DateFin = @fin, Description = @description, Localisation = @loc " +
+                    "WHERE ID = @id and UserID = @userID", connection))
+                {
+                    command.Parameters.AddWithValue("userID", App.User.id);
+                    command.Parameters.AddWithValue("id", nvx.ID);
+                    command.Parameters.AddWithValue("titre", nvx.Titre);
+                    command.Parameters.AddWithValue("classe", nvx.Classe);
+                    command.Parameters.AddWithValue("debut", nvx.DateDebut.ToString());
+                    command.Parameters.AddWithValue("fin", nvx.DateFin.ToString());
+                    command.Parameters.AddWithValue("description", nvx.Description);
+                    command.Parameters.AddWithValue("loc", nvx.Lieu);
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
 
@@ -168,72 +147,44 @@ namespace DotAgenda.MethodClass.DataBaseMethods
 
         public void DeleteEventToDB(EventDay EventRemove)
         {
-            int id = EventRemove.ID;
+            using(var connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using(SQLiteCommand command = new SQLiteCommand("DELETE FROM FileEvent WHERE IDevent=@id and UserID=@userID", connection))
+                {
+                    command.Parameters.AddWithValue("@userID", App.User.id);
+                    command.Parameters.AddWithValue("@id", EventRemove.ID);
+                    command.ExecuteNonQuery();
 
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            command.CommandText = "DELETE FROM FileEvent WHERE IDevent=@id ";
-
-            SQLiteParameter p1 = new SQLiteParameter("id", EventRemove.ID);
-            command.Parameters.Add(p1);
-
-            command.ExecuteNonQuery();
-
-            command.CommandText = "DELETE FROM Evenement WHERE ID = @id";
-
-            command.Parameters[0] = new SQLiteParameter("id", id);
-            command.ExecuteNonQuery();
+                    command.CommandText = "DELETE FROM Evenement WHERE ID = @id and UserID = @userID";
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
 
-        public int AddEventToDB(EventDay EventAdd)
+        public bool AddEventToDB(EventDay EventAdd)
         {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            //Ajout dans base de donnée
-
-            command.CommandText = "INSERT INTO Evenement (Titre, Classe, DateDebut, DateFin) VALUES (@titre, @classe, @debut, @fin)";
-
-
-            SQLiteParameter p1 = new SQLiteParameter("titre", EventAdd.Titre);
-            SQLiteParameter p2 = new SQLiteParameter("classe", EventAdd.Classe);
-            SQLiteParameter p3 = new SQLiteParameter("debut", EventAdd.DateDebut.ToString());
-            SQLiteParameter p4 = new SQLiteParameter("fin", EventAdd.DateFin.ToString());
-
-            command.Parameters.Add(p1);
-            command.Parameters.Add(p2);
-            command.Parameters.Add(p3);
-            command.Parameters.Add(p4);
-
-            command.ExecuteNonQuery();
-
-            //On récupère l'ID
-
-            SQLiteCommand CommandGetID = new SQLiteCommand(connection);
-            CommandGetID.CommandText = "SELECT ID FROM Evenement WHERE (Titre = @titre and Classe = @classe and DateDebut = @debut and DateFin = @fin)";
-
-            p1 = new SQLiteParameter("titre", EventAdd.Titre);
-            p2 = new SQLiteParameter("classe", EventAdd.Classe);
-            p3 = new SQLiteParameter("debut", EventAdd.DateDebut.ToString());
-            p4 = new SQLiteParameter("fin", EventAdd.DateFin.ToString());
-
-            CommandGetID.Parameters.Add(p1);
-            CommandGetID.Parameters.Add(p2);
-            CommandGetID.Parameters.Add(p3);
-            CommandGetID.Parameters.Add(p4);
-
-            SQLiteDataReader reader = CommandGetID.ExecuteReader();
-
-            while (reader.Read())
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
             {
-                return int.Parse(reader["ID"].ToString());
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("INSERT INTO " +
+                    "Evenement (UserID, ID, Titre, Classe, Description, Localisation, DateDebut, DateFin) " +
+                    "VALUES (@userID, @id, @titre, @classe, @description, @lieu, @debut, @fin)", connection))
+                {
+                    command.Parameters.AddWithValue("@userID", App.User.id);
+                    command.Parameters.AddWithValue("@id", EventAdd.ID);
+                    command.Parameters.AddWithValue("@titre", EventAdd.Titre);
+                    command.Parameters.AddWithValue("@classe", EventAdd.Classe);
+                    command.Parameters.AddWithValue("@description", EventAdd.Description);
+                    command.Parameters.AddWithValue("@lieu", EventAdd.Lieu);
+                    command.Parameters.AddWithValue("@debut", EventAdd.DateDebut.ToString("s"));
+                    command.Parameters.AddWithValue("@fin", EventAdd.DateFin.ToString("s"));
+                    command.ExecuteNonQuery();
+                }
             }
 
-            return -1;
+            return true;
         }
     }
 }

@@ -113,7 +113,7 @@ namespace DotAgenda.View.Popups
             if (valide)
             {
 
-                TodoItem TodoAdd = new TodoItem(Titre, DateTime.Parse(DatePickerTodo.SelectedDate.Value.ToString()), "", false, -1);
+                TodoItem TodoAdd = new TodoItem(Titre, DateTime.Parse(DatePickerTodo.SelectedDate.Value.ToString()), "", false, _prim.GenerateID());
 
                 _db.Todo.AjouterTodo(TodoAdd);
 

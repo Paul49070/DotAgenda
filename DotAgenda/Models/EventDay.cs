@@ -64,7 +64,7 @@ namespace DotAgenda.Models
 
 
 
-        public EventDay(int id, string titre, DateTime startTime , DateTime endTime, string location, string description, string classe, bool visible = true) 
+        public EventDay(string id, string titre, DateTime startTime , DateTime endTime, string location, string description, string classe, bool visible = true) 
             : base(id, titre, startTime, endTime, description, classe)
         {        
             Lieu = location;        

@@ -1,4 +1,5 @@
-﻿using DotAgenda.Models;
+﻿using DevExpress.Utils.About;
+using DotAgenda.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,149 +25,104 @@ namespace DotAgenda.MethodClass.DataBaseMethods
 
         public void DeleteFileToDB(Fichier fic)
         {
-
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            //Ajout dans base de donnée
-
-            command.CommandText = "DELETE FROM Fichiers WHERE Nom=@nom ";
-
-            SQLiteParameter p1 = new SQLiteParameter("nom", fic.Nom);
-            command.Parameters.Add(p1);
-
-            command.ExecuteNonQuery();
-
-            command.CommandText = "DELETE FROM FileEvent WHERE IDfile=@idfile ";
-            command.Parameters[0] = new SQLiteParameter("idfile", fic.ID);
-
-            command.ExecuteNonQuery();
-
-        }
-
-        public void AddFileToDB(string nomFichier)
-        {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            //Ajout dans base de donnée
-
-            command.CommandText = "INSERT INTO Fichiers(Nom, DateAjout) VALUES (@nom, @date)";
-
-
-            SQLiteParameter p1 = new SQLiteParameter("nom", nomFichier);
-            SQLiteParameter p2 = new SQLiteParameter("date", DateTime.Today);
-
-            command.Parameters.Add(p1);
-            command.Parameters.Add(p2);
-
-            command.ExecuteNonQuery();
-        }
-
-
-
-        public int GetFileID(string nomFichier)
-        {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            //Ajout dans base de donnée
-
-            command.CommandText = "SELECT ID FROM Fichiers WHERE Nom=@nom";
-
-
-            SQLiteParameter p1 = new SQLiteParameter("nom", nomFichier);
-
-            command.Parameters.Add(p1);
-
-            SQLiteDataReader reader = command.ExecuteReader();
-
-            int id = -1;
-
-            while (reader.Read())
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
             {
-                id = int.Parse(reader["ID"].ToString());
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("DELETE FROM FileEvent WHERE IDfile=@id and UserID=@userID", connection))
+                {
+                    command.Parameters.AddWithValue("@userID", App.User.id);
+                    command.Parameters.AddWithValue("@id", fic.ID);
+                    command.ExecuteNonQuery();
+
+                    command.CommandText = "DELETE FROM Fichiers WHERE ID = @id and UserID = @userID";
+                    command.ExecuteNonQuery();
+                }
             }
 
-            return id;
+        }
+
+        public bool AddFileToDB(Fichier fic)
+        {
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("INSERT INTO Fichiers(UserID, ID, Nom, DateAjout) VALUES(@userID, @id, @nom, @date)", connection))
+                {
+                    command.Parameters.AddWithValue("userID", App.User.id);
+                    command.Parameters.AddWithValue("id", fic.ID);
+                    command.Parameters.AddWithValue("nom", fic.Nom);
+                    command.Parameters.AddWithValue("date",fic.DateAjout.ToString("s"));
+                    command.ExecuteNonQuery();
+
+                    return true;
+                }
+            }
         }
 
 
 
         public void DeleteFileToDB_Event(Fichier fic, EventDay evenement)
         {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            //Ajout dans base de donnée
-
-            command.CommandText = "DELETE FROM FileEvent WHERE (IDfile = @idfile and IDevent = @idevent)";
-
-            SQLiteParameter p1 = new SQLiteParameter("idfile", int.Parse(fic.ID.ToString()));
-            SQLiteParameter p2 = new SQLiteParameter("idevent", int.Parse(evenement.ID.ToString()));
-
-            command.Parameters.Add(p1);
-            command.Parameters.Add(p2);
-
-            command.ExecuteNonQuery();
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("DELETE FROM FileEvent WHERE (IDfile = @idfile and IDevent = @idevent and UserID = @userID)", connection))
+                {
+                    command.Parameters.AddWithValue("@userID", App.User.id);
+                    command.Parameters.AddWithValue("@idevent", evenement.ID);
+                    command.Parameters.AddWithValue("@idfile", fic.ID);
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public void AddFileToDB_Event(Fichier fic, EventDay evenement)
         {
-
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            //Ajout dans base de donnée
-
-            command.CommandText = "INSERT INTO FileEvent (IDfile, IDevent) VALUES (@idfile, @idevent)";
-
-            SQLiteParameter p1 = new SQLiteParameter("idfile", int.Parse(fic.ID.ToString()));
-            SQLiteParameter p2 = new SQLiteParameter("idevent", int.Parse(evenement.ID.ToString()));
-
-            command.Parameters.Add(p1);
-            command.Parameters.Add(p2);
-
-            command.ExecuteNonQuery();
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("INSERT INTO FileEvent (UserID, IDfile, IDevent) VALUES (@userID, @idfile, @idevent)", connection))
+                {
+                    command.Parameters.AddWithValue("@userID", App.User.id);
+                    command.Parameters.AddWithValue("@idevent", evenement.ID);
+                    command.Parameters.AddWithValue("@idfile", fic.ID);
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
 
 
-        public Fichier GetFileWithID(int id)
+        public Fichier GetFileWithID(string id)
         {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            //Ajout dans base de donnée
-
-            command.CommandText = "SELECT * FROM Fichiers WHERE ID = @id";
-
-            SQLiteParameter p1 = new SQLiteParameter("id", id);
-
-            command.Parameters.Add(p1);
-
-            SQLiteDataReader reader = command.ExecuteReader();
-
-            Fichier fic = new Fichier();
-
-            while (reader.Read())
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
             {
-                fic.Nom = reader["Nom"].ToString();
-            }
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Fichiers WHERE ID = @id and UserID = @userID", connection))
+                {
+                    command.Parameters.AddWithValue("userID", App.User.id);
+                    command.Parameters.AddWithValue("id", id);
 
-            foreach (Fichier temp in _global.ListeFichiers)
-            {
-                if (temp.Nom == fic.Nom)
-                    return temp;
-            }
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            if (DateTime.TryParse(reader.GetString(0), out DateTime start) && DateTime.TryParse(reader.GetString(1), out DateTime end))
+                            {
 
-            return fic;
+                                int year = start.Year - DateTime.Today.Year + 1;
+                                foreach (Fichier fic in _global.ListeFichiers)
+                                {
+                                    if (fic.ID == id)
+                                        return fic;
+                                }
+                            }
+                        }
+                    }
+
+                    return null;
+                }
+            }
         }
 
 
@@ -175,39 +131,32 @@ namespace DotAgenda.MethodClass.DataBaseMethods
         {
             ObservableCollection<Fichier> ListeFichiers = new ObservableCollection<Fichier>();
 
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            //Ajout dans base de donnée
-
-            command.CommandText = "SELECT * FROM Fichiers";
-
-            SQLiteDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
             {
-                Fichier fichier = new Fichier();
-
-                fichier.Nom = reader["Nom"].ToString();
-                fichier.DateAjout = DateTime.Parse(reader["DateAjout"].ToString());
-                fichier.ID = int.Parse(reader["ID"].ToString());
-
-                FileInfo fi = new FileInfo(fichier.Nom);
-
-                try
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Fichiers WHERE UserID = @userID", connection))
                 {
-                    fichier.Type = _dict.ExtensionDict[fi.Extension];
+                    command.Parameters.AddWithValue("userID", App.User.id);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        string ID, Nom;
+                        DateTime DateAjout;
+
+                        while (reader.Read())
+                        {
+                            ID = reader.GetString(0);
+                            Nom = reader.GetString(1);
+
+                            if(DateTime.TryParse(reader.GetString(2).ToString(), out DateAjout))
+                            {
+                                Fichier fic = new Fichier(ID, Nom, DateAjout);
+                                ListeFichiers.Add(fic);
+                            }
+
+                        }
+                    }
                 }
-
-                catch
-                {
-                    fichier.Type = _dict.Autre;
-                }
-
-                fichier.AddToFolderType();
-
-                ListeFichiers.Add(fichier);
             }
 
             return ListeFichiers;

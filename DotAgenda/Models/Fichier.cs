@@ -1,6 +1,7 @@
 ﻿using DotAgenda.MethodClass;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,8 +44,8 @@ namespace DotAgenda.Models
         }
 
 
-        private int _ID;
-        public int ID
+        private string _ID;
+        public string ID
         {
             get { return _ID; }
             set { _ID = value; }
@@ -58,10 +59,31 @@ namespace DotAgenda.Models
         }
 
 
-        public Fichier()
+        public Fichier(string ID, string Nom, DateTime DateAjout = default(DateTime))
         {
             _global = GestionnaireEvent._global;
+
+            this.ID = ID;
+            this.Nom = Nom;
+
+            try
+            {
+                FileInfo fi = new FileInfo(Nom);
+                Type = _global._dict.ExtensionDict[fi.Extension];
+            }
+
+            catch
+            {
+                Type = _global._dict.ExtensionDict["null"];
+            }
+
+            if(DateAjout != default(DateTime))
+                this.DateAjout = DateTime.Today;
+
             AttachedEvent = new List<EventDay>();
+
+            AddToFolderType();
+            _global.ListeFichiers.Add(this);
         }
 
         public void AddToFolderType()

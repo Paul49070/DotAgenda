@@ -151,9 +151,8 @@ namespace DotAgenda.View.Popups
             {
                 string couleur = _dict.DictClasse[classe].Couleur;
 
-                EventDay EventAdd = new EventDay(-1, Titre, debut, fin, "", "", classe);
+                EventDay EventAdd = new EventDay(_prim.GenerateID(), Titre, debut, fin, "", "", classe);
                 
-
                 _global.A[debut.Year - DateTime.Today.Year +1].M[debut.Month - 1].J[debut.Day-1].AjouterEvent(EventAdd);
 
 

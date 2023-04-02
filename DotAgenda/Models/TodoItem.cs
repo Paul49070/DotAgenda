@@ -44,7 +44,7 @@ namespace DotAgenda.Models
         }
 
 
-        public TodoItem(string titre, DateTime debut, string classe, bool fini, int ID = -1, string description = "", 
+        public TodoItem(string titre, DateTime debut, string classe, bool fini, string ID, string description = "", 
             Priorite priorite = Priorite.Medium, States status = States.NotStarted, DateTime fin = default)
 
             :base(ID,titre,debut,fin,description,classe,fini)

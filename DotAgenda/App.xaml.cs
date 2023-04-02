@@ -21,7 +21,6 @@ namespace DotAgenda
         public static Profil User;
         
         public static string SystemDB_Path = "DataSource =SystemDB.db";
-        public static string DB_Path = "";
 
         public static string NameDB_System  {get;} = "SystemDB.db";
 
