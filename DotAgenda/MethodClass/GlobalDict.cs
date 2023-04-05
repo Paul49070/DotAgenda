@@ -19,9 +19,7 @@ namespace DotAgenda.MethodClass
         public Dictionary<string, string[]> DossierTypeIconDict;
         public Dictionary<string, string> ExtensionDict;
         public Dictionary<string, ClasseEvent_item> DictClasse;
-
-        public DataBase _db;
-
+        public Dictionary<string, GroupEvent> DictGroupEvent;
 
         private string Audio = "Audio";
         private string Video = "Video";
@@ -34,7 +32,7 @@ namespace DotAgenda.MethodClass
         private string Tableau = "Table";
         private string Systeme = "Systeme";
         private string Texte = "Texte";
-        private string Code = "Code";
+        private readonly string Code = "Code";
         public string Autre { get; } = "Autre";
         
         private GlobalDict()
@@ -42,10 +40,11 @@ namespace DotAgenda.MethodClass
             
         }
 
-        public void InitAll(List<ClasseEvent_item> classe)
+        public void InitAll()
         {
+            DictClasse = new Dictionary<string, ClasseEvent_item>();
+            DictGroupEvent = new Dictionary<string, GroupEvent>();
             DictMois =InitTailleMois();
-            DictClasse = InitClasse(classe);
             DossierTypeIconDict = InitTypeIcon();
             ExtensionDict = InitExtension();
         }
@@ -70,21 +69,6 @@ namespace DotAgenda.MethodClass
 
             return DictMois;
         }
-
-        public Dictionary<string, ClasseEvent_item> InitClasse(List<ClasseEvent_item> Classe)
-        {
-            Dictionary<string, ClasseEvent_item> DictClasse = new Dictionary<string, ClasseEvent_item>();
-
-            for (int i = 0; i < Classe.Count; ++i)
-            {
-                DictClasse.Add(Classe[i].Titre, Classe[i]);
-            }
-
-            return DictClasse;
-        }
-
-
-
 
         public Dictionary<string, string[]> InitTypeIcon()
         {

@@ -14,12 +14,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
         private static readonly DataBaseFile dbFile = new DataBaseFile();
         public static DataBaseFile _dbFile => dbFile;
 
-        public DataBase _db;
-        public Primitives _prim;
-        public GlobalDict _dict;
-        public GestionnaireEvent _global;
-
-        private DataBaseFile()
+        protected DataBaseFile()
         {
         }
 
@@ -91,8 +86,6 @@ namespace DotAgenda.MethodClass.DataBaseMethods
             }
         }
 
-
-
         public Fichier GetFileWithID(string id)
         {
             using (var connection = new SQLiteConnection(App.SystemDB_Path))
@@ -111,7 +104,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
                             {
 
                                 int year = start.Year - DateTime.Today.Year + 1;
-                                foreach (Fichier fic in _global.ListeFichiers)
+                                foreach (Fichier fic in GestionnaireEvent._global.ListeFichiers)
                                 {
                                     if (fic.ID == id)
                                         return fic;
@@ -127,16 +120,14 @@ namespace DotAgenda.MethodClass.DataBaseMethods
 
 
 
-        public ObservableCollection<Fichier> SetListeFichiers()
+        public void SetListeFichiers()
         {
-            ObservableCollection<Fichier> ListeFichiers = new ObservableCollection<Fichier>();
-
             using (var connection = new SQLiteConnection(App.SystemDB_Path))
             {
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Fichiers WHERE UserID = @userID", connection))
                 {
-                    command.Parameters.AddWithValue("userID", App.User.id);
+                    command.Parameters.AddWithValue("userID", App.ID);
 
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
@@ -145,21 +136,18 @@ namespace DotAgenda.MethodClass.DataBaseMethods
 
                         while (reader.Read())
                         {
-                            ID = reader.GetString(0);
-                            Nom = reader.GetString(1);
+                            ID = reader.GetString(1);
+                            Nom = reader.GetString(2);
 
-                            if(DateTime.TryParse(reader.GetString(2).ToString(), out DateAjout))
+                            if(DateTime.TryParse(reader.GetString(3).ToString(), out DateAjout))
                             {
                                 Fichier fic = new Fichier(ID, Nom, DateAjout);
-                                ListeFichiers.Add(fic);
                             }
 
                         }
                     }
                 }
             }
-
-            return ListeFichiers;
         }
     }
 }

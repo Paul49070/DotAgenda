@@ -72,8 +72,6 @@ namespace DotAgenda.View.Converter
 
                 double duree = CalculMargin(lastEvent, PlusTot);
 
-                Console.WriteLine(duree);
-
                 return new Thickness(2, duree, 2, 0);
             }
 

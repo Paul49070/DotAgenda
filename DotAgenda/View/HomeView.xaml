@@ -63,7 +63,7 @@
                     </Grid.RowDefinitions>
                     <Calendar Style="{DynamicResource CalendarStyle1}" CalendarItemStyle="{DynamicResource CalendarCalendarItemStyle1}" 
                   CalendarButtonStyle="{DynamicResource Week+-}"                  
-                  VerticalAlignment="Center" DisplayDateEnd="12/31/2025" DisplayDateStart="01/01/2022"
+                  VerticalAlignment="Center"
                   HorizontalAlignment="Left" 
                   x:Name="Calendrier"
                   SelectedDatesChanged="MonthlyCalendar_SelectedDatesChanged" CalendarDayButtonStyle="{DynamicResource DaySpeStyle}" Grid.ColumnSpan="2"/>

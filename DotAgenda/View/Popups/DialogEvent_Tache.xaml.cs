@@ -37,9 +37,9 @@ namespace DotAgenda.View.Popups
             InitializeComponent();
 
             _global = GestionnaireEvent._global;
-            _dict = _global._dict;
-            _db = _global._db;
-            _prim = _global._prim;
+            _dict = GlobalDict._dict;
+            _db = DataBase._db;
+            _prim = Primitives._prim;
 
             TitreEvent.LostFocus += TitreEvent_LostFocus;
             TitreEvent.GotFocus += TitreEvent_GotFocus;
@@ -113,9 +113,8 @@ namespace DotAgenda.View.Popups
             if (valide)
             {
 
-                TodoItem TodoAdd = new TodoItem(Titre, DateTime.Parse(DatePickerTodo.SelectedDate.Value.ToString()), "", false, _prim.GenerateID());
-
-                _db.Todo.AjouterTodo(TodoAdd);
+                TodoItem TodoAdd = new TodoItem(Titre, DateTime.Parse(DatePickerTodo.SelectedDate.Value.ToString()), "", false);
+                TodoAdd.AjouterTodoToDB();
 
                 Window parentWindow = Window.GetWindow(this);
                 parentWindow.Close();

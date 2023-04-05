@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SQLite;
 using System.IO;
-
+using System.Windows;
 
 namespace DotAgenda.MethodClass.DataBaseMethods
 {
@@ -13,106 +13,93 @@ namespace DotAgenda.MethodClass.DataBaseMethods
         private static readonly DataBaseTodo dbTodo = new DataBaseTodo();
         public static DataBaseTodo _dbTodo => dbTodo;
 
-        public DataBase _db;
-        public Primitives _prim;
-        public GlobalDict _dict;
-        public GestionnaireEvent _global;
-
-        private DataBaseTodo()
+        protected DataBaseTodo()
         {
         }
 
         public void InitTodo()
         {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
+            GestionnaireEvent _global = GestionnaireEvent._global;
 
-            command.CommandText = "SELECT * FROM Todo";
-            SQLiteDataReader reader = command.ExecuteReader();
-            bool TodoFini;
-
-            while (reader.Read())
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
             {
-                if (reader["Etat"].ToString() == "1") TodoFini = true;
-                else TodoFini = false;
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Todo WHERE UserID = @userID", connection))
+                {
+                    command.Parameters.AddWithValue("userID", App.User.id);
 
-                TodoItem Tache = new TodoItem(
+                    bool etat;
+                    string titre, classe, ID;
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ID = reader.GetString(1);
+                            titre = reader.GetString(2);
+                            classe = reader.GetString(3);
+                            etat = reader.GetBoolean(4);
 
-                    reader["Titre"].ToString(), 
+                            if (DateTime.TryParse(reader.GetString(5), out DateTime debut))
+                            {
+                                TodoItem Todo;
 
-                    DateTime.Parse(reader["Date"].ToString()), 
+                                if (DateTime.TryParse(reader.GetString(6), out DateTime fin))
+                                {
+                                    //ajouter la date de fin
+                                     new TodoItem(titre, debut, classe, etat, ID);
+                                }
 
-                    reader["Projet"].ToString(), 
+                                else
+                                {
+                                     new TodoItem(titre, debut, classe, etat, ID);
+                                }
 
-                    TodoFini, 
-
-                    reader["ID"].ToString()
-                );
-
-                int index;
-
-                if (Tache.Fini)
-                    index = _global.A[Tache.DateDebut.Year - DateTime.Today.Year + 1].M[Tache.DateDebut.Month - 1].J[Tache.DateDebut.Day - 1].Todo.Count;
-
-                else index = _prim.FindTodoIndex(Tache);
-
-                _global.A[Tache.DateDebut.Year - DateTime.Today.Year + 1].M[Tache.DateDebut.Month - 1].J[Tache.DateDebut.Day - 1].AjouterTodoToList(index, Tache);
+                            }
+                        }
+                    }
+                }
             }
         }
 
 
-        public TodoItem AjouterTodo(TodoItem TodoAdd)
+        public bool AjouterTodo(TodoItem TodoAdd)
         {
-            //Connection Base de Donnée
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
 
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
+                using (SQLiteCommand command = new SQLiteCommand("INSERT INTO Todo (UserID, ID, Titre, Projet, Etat, DateDebut, DateFin) VALUES (@userID, @ID, @titre, @projet, @etat, @start, @end)", connection))
+                {
+                    command.Parameters.AddWithValue("userID", App.ID);
+                    command.Parameters.AddWithValue("ID", TodoAdd.ID);
+                    command.Parameters.AddWithValue("titre", TodoAdd.Titre);
+                    command.Parameters.AddWithValue("projet", TodoAdd.Classe);
+                    command.Parameters.AddWithValue("etat", Primitives._prim.BoolToInt(TodoAdd.Fini));
+                    command.Parameters.AddWithValue("start", TodoAdd.DateDebut.ToString("s"));
+                    command.Parameters.AddWithValue("end", TodoAdd.DateFin.ToString("s"));
 
-            //Ajout dans base de donnée
+                    command.ExecuteNonQuery();
+                }
+            }
 
-            command.CommandText = "INSERT INTO Todo (Titre, Projet, Etat, Date) VALUES (@titre, @projet, @etat, @date)";
-
-
-            SQLiteParameter p1 = new SQLiteParameter("titre", TodoAdd.Titre);
-            SQLiteParameter p2 = new SQLiteParameter("projet", TodoAdd.Classe);
-            SQLiteParameter p3 = new SQLiteParameter("etat", false);
-            SQLiteParameter p4 = new SQLiteParameter("date", TodoAdd.DateDebut);
-
-            command.Parameters.Add(p1);
-            command.Parameters.Add(p2);
-            command.Parameters.Add(p3);
-            command.Parameters.Add(p4);
-
-            command.ExecuteNonQuery();
-
-            _global.A[TodoAdd.DateDebut.Year - DateTime.Today.Year + 1].M[TodoAdd.DateDebut.Month - 1].J[TodoAdd.DateDebut.Day - 1].AjouterTodoToList(_prim.FindTodoIndex(TodoAdd), TodoAdd);
-
-            return TodoAdd;
+            return true;
         }
 
 
         public void ChangeEtatTacheDB(TodoItem Tache)
         {
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection)
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
             {
-                CommandText = "UPDATE Todo SET Etat = @etat WHERE (ID = @id)"
-            };
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("UPDATE Todo SET Etat = @etat WHERE (ID = @id and UserID = @userID)", connection))
+                {
+                    command.Parameters.AddWithValue("userID", App.ID);
+                    command.Parameters.AddWithValue("id", Tache.ID);
+                    command.Parameters.AddWithValue("etat", Primitives._prim.BoolToInt(Tache.Fini));
 
-            int etat;
-            if (Tache.Fini == true) etat = 1;
-            else etat = 0;
-
-            SQLiteParameter p1 = new SQLiteParameter("etat", etat);
-            SQLiteParameter p2 = new SQLiteParameter("id", Tache.ID);
-
-            command.Parameters.Add(p1);
-            command.Parameters.Add(p2);
-
-            command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
 
@@ -121,18 +108,17 @@ namespace DotAgenda.MethodClass.DataBaseMethods
         {
             //Connection DB
 
-            SQLiteConnection connection = new SQLiteConnection(App.DB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("DELETE FROM Todo WHERE (ID = @id and UserID = @userID)", connection))
+                {
+                    command.Parameters.AddWithValue("userID", App.ID);
+                    command.Parameters.AddWithValue("id", Tache.ID);
 
-            command.CommandText = "DELETE FROM Todo WHERE (ID = @id)";
-
-            //Suppression dans Base de Donnees
-
-            SQLiteParameter p1 = new SQLiteParameter("id", Tache.ID);
-
-            command.Parameters.Add(p1);
-            command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

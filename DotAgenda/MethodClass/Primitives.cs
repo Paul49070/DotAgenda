@@ -10,6 +10,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Appointments;
+using DevExpress.Data.TreeList;
+using static DotAgenda.Models.EventDay;
+using System.Web.UI.Design;
+using System.Windows;
+using Microsoft.SqlServer.Management.XEvent;
 
 namespace DotAgenda.MethodClass
 {
@@ -18,11 +24,6 @@ namespace DotAgenda.MethodClass
         private static readonly Primitives prim = new Primitives();
 
         public static Primitives _prim => prim;
-
-
-        public GlobalDict _dict;
-        public GestionnaireEvent _global;
-        public DataBase _db;
 
         private Primitives()
         {
@@ -45,6 +46,8 @@ namespace DotAgenda.MethodClass
         public EventDay SearchNextEvent(int delai, DateTime Date)
         {
             //Si y'a plus d'évènement ajd on va a demain
+
+            GestionnaireEvent _global = GestionnaireEvent._global;
 
             for (int i = 0; i < delai; ++i)
             {
@@ -71,6 +74,8 @@ namespace DotAgenda.MethodClass
 
         public int Tri(DateTime Date)
         {
+            GestionnaireEvent _global = GestionnaireEvent._global;
+
             int numM = Date.Month - 1;
             int numJ = Date.Day - 1;
             int numY = Date.Year - DateTime.Today.Year + 1;
@@ -98,7 +103,7 @@ namespace DotAgenda.MethodClass
         {
             if (evenement.RemoveFile(fic))
             {
-                _db.File.DeleteFileToDB_Event(fic, evenement);
+                DataBaseFile._dbFile.DeleteFileToDB_Event(fic, evenement);
             }
 
             else
@@ -113,10 +118,8 @@ namespace DotAgenda.MethodClass
             string fileID = GenerateID();
             Fichier ficAdded = new Fichier(fileID, nomFichier);
 
-            if (_db.File.AddFileToDB(ficAdded))
+            if (DataBaseFile._dbFile.AddFileToDB(ficAdded))
             {
-                ficAdded.AddToFolderType();
-                _global.ListeFichiers.Add(ficAdded);
             }
 
             return ficAdded;
@@ -129,11 +132,11 @@ namespace DotAgenda.MethodClass
 
             if (fic.Type == null)
             {
-                fic = _db.File.GetFileWithID(fic.ID);
+                fic = DataBaseFile._dbFile.GetFileWithID(fic.ID);
             }
 
             if (evenement.AddFile(fic))
-                _db.File.AddFileToDB_Event(fic, evenement);
+                DataBaseFile._dbFile.AddFileToDB_Event(fic, evenement);
 
             else
             {
@@ -145,11 +148,11 @@ namespace DotAgenda.MethodClass
 
         public void DeleteFile(Fichier fic)
         {
-            _global.ListeFichiers.Remove(fic);
+            GestionnaireEvent._global.ListeFichiers.Remove(fic);
             fic.DetachAll();
             fic.RemoveFromDossierType();
 
-            _db.File.DeleteFileToDB(fic);
+            DataBaseFile._dbFile.DeleteFileToDB(fic);
         }
 
         public bool Event_Fini(DateTime Date)
@@ -160,6 +163,8 @@ namespace DotAgenda.MethodClass
 
         public int FindTodoIndex(TodoItem Todo)
         {
+            GestionnaireEvent _global = GestionnaireEvent._global;
+
             int numY = Todo.DateDebut.Year - DateTime.Today.Year + 1;
             int numM = Todo.DateDebut.Month - 1;
             int numJ = Todo.DateDebut.Day - 1;
@@ -181,28 +186,215 @@ namespace DotAgenda.MethodClass
             else return _global.A[numY].M[numM].J[numJ].Todo.Count - 1;
         }
 
-
-
-        public void ModifEvent(EventDay nvx, EventDay old, Annee[] A)
+        public bool DeleteGroupEvent(EventDay EventToRemove, string GroupID, DateTime start = default, DateTime end = default)
         {
-            int numY = nvx.DateDebut.Year - DateTime.Today.Year + 1;
-            int mois = nvx.DateDebut.Month - 1;
-            int jour = nvx.DateDebut.Day - 1;
+            DataBaseEvents._dbEvent.DeleteGroupEvent(EventToRemove, start, ExceptSender: true);
+
+            GroupEvent grpEvent;
+
+            try
+            {
+                grpEvent = GlobalDict._dict.DictGroupEvent[GroupID];
+            }
+
+            catch { return false; }
+
+            List<EventDay> EventDuGroupe = grpEvent.GroupEventListe.OrderBy(e => e.DateDebut).ToList();
+
+            foreach(EventDay e in EventDuGroupe)
+            {
+                if(e.DateDebut >= end && e.DateFin <= start)
+                {
+                    e.RemoveEvent();
+                }
+            }
+
+            return true;
+        }
+
+        public void ModifEvent(EventDay nvx, EventDay old)
+        {
+            if (nvx.Reccurence != old.Reccurence)
+            {
+
+                if (nvx.Reccurence.Repeat == RepeatType.None)
+                {
+                    //Il y avait des reccurences, on n'en veut plus
+                    DeleteGroupEvent(nvx, nvx.GroupID, start:old.DateDebut);
+                }
+                //Si on ajoute une réccurence, alors on doit créer un groupID
+
+                else
+                {
+
+                    nvx = nvx.Clone(GenerateNewGroupID: true);
+                    AddEvent(nvx, true);
+                }
+            }
 
             int numY_old = old.DateDebut.Year - DateTime.Today.Year + 1;
             int mois_old = old.DateDebut.Month - 1;
             int jour_old = old.DateDebut.Day - 1;
 
+            int numY = nvx.DateDebut.Year - DateTime.Today.Year + 1;
+            int mois = nvx.DateDebut.Month - 1;
+            int jour = nvx.DateDebut.Day - 1;
 
-            A[numY].M[mois].J[jour].AddEventToList(nvx);
-            A[numY_old].M[mois_old].J[jour_old].DeleteEventToList(old);
+            GestionnaireEvent._global.A[numY_old].M[mois_old].J[jour_old].DeleteEventToList(old);
+            GestionnaireEvent._global.A[numY].M[mois].J[jour].AddEventToList(nvx);
 
-            _db.Event.ModifEvent(nvx);
+            DataBaseEvents._dbEvent.ModifEvent(nvx);
+        }
+        
+
+
+        public void AddEvent(EventDay EventToAdd, bool ExceptSender = false)
+        {
+            DateTime EndDate = App.LastDate;
+
+            DateTime start = EventToAdd.DateDebut, end = EventToAdd.DateFin;            
+            
+            if(!ExceptSender)
+                GestionnaireEvent._global.A[start.Year - DateTime.Today.Year + 1].M[start.Month - 1].J[start.Day - 1].AjouterEvent(EventToAdd);
+
+            switch (EventToAdd.Reccurence.Repeat)
+            {
+                case RepeatType.None:
+                    break;
+
+                case RepeatType.Daily:
+
+
+                    if (EventToAdd.Reccurence.ForXtime == -1)    //Infini
+                    {
+                        while (end<=EndDate)
+                        {
+                            AddWithDayFrequency(EventToAdd, ref start, ref end);
+                        }
+                    }
+
+                    else
+                    {
+                        for(int i = 0; i<EventToAdd.Reccurence.ForXtime; ++i)
+                        {
+                            AddWithDayFrequency(EventToAdd, ref start, ref end);
+                        }
+                    }
+
+                    break;
+
+                case RepeatType.Weekly:
+
+
+                    if (EventToAdd.Reccurence.ForXtime == -1)    //Infini
+                    {
+                        while (end <= EndDate)
+                        {
+                            AddWithWeekFrequency(EventToAdd, ref start, ref end);
+                        }
+                    }
+
+                    else
+                    {
+                        for (int i = 0; i < EventToAdd.Reccurence.ForXtime; ++i)
+                        {
+                            AddWithWeekFrequency(EventToAdd, ref start, ref end);
+                        }
+                    }
+
+                    break;
+
+                case RepeatType.Monthly:
+
+                    if (EventToAdd.Reccurence.ForXtime == -1)    //Infini
+                    {
+                        while (end <= EndDate)
+                        {
+                            AddWithMonthFrequency(EventToAdd, ref start, ref end);
+                        }
+                    }
+
+                    else
+                    {
+                        for (int i = 0; i < EventToAdd.Reccurence.ForXtime; ++i)
+                        { 
+                            AddWithMonthFrequency(EventToAdd, ref start, ref end);
+                        }
+                    }
+
+                    break;
+
+                case RepeatType.Yearly:
+
+                    if (EventToAdd.Reccurence.ForXtime == -1)    //Infini
+                    {
+                        while (end <= EndDate)
+                        {
+                            AddWithYearFrequency(EventToAdd, ref start, ref end);
+                        }
+                    }
+
+                    else
+                    {
+                        for (int i = 0; i < EventToAdd.Reccurence.ForXtime; ++i)
+                        {
+                            AddWithYearFrequency(EventToAdd, ref start, ref end);
+                        }
+                    }
+
+                    break;
+            }
+        }
+
+        private void AddWithDayFrequency(EventDay EventInitial, ref DateTime start, ref DateTime end)
+        {
+
+            start = start.AddDays(EventInitial.Reccurence.EveryXtime);    // => tout les x jours
+            end = end.AddDays(EventInitial.Reccurence.EveryXtime);
+
+            CreateAndAddevent(EventInitial, start, end);
+        }
+
+        private void AddWithWeekFrequency(EventDay EventInitial, ref DateTime start, ref DateTime end)
+        {
+            start = start.AddDays(EventInitial.Reccurence.EveryXtime * 7);
+            end = end.AddDays(EventInitial.Reccurence.EveryXtime * 7);
+
+            CreateAndAddevent(EventInitial, start, end);
+        }
+
+        private void AddWithMonthFrequency(EventDay EventInitial, ref DateTime start, ref DateTime end)
+        {
+
+            start = start.AddMonths(EventInitial.Reccurence.EveryXtime);    // => tout les x jours
+            end = end.AddMonths(EventInitial.Reccurence.EveryXtime);
+
+            CreateAndAddevent(EventInitial, start, end);
+        }
+
+        private void AddWithYearFrequency(EventDay EventInitial, ref DateTime start, ref DateTime end)
+        {
+            start = start.AddYears(EventInitial.Reccurence.EveryXtime);    // => tout les x jours
+            end = end.AddYears(EventInitial.Reccurence.EveryXtime);
+
+            CreateAndAddevent(EventInitial, start, end);
+        }
+
+        private void CreateAndAddevent(EventDay EventInitial, DateTime start, DateTime end)
+        {
+            if (end <= App.LastDate)
+            {
+                EventDay newEvent = new EventDay(EventInitial.Titre, start, end, EventInitial.Classe, GroupID: EventInitial.GroupID);
+
+                GestionnaireEvent._global.A[start.Year - DateTime.Today.Year + 1].M[start.Month - 1].J[start.Day - 1].AjouterEvent(newEvent);
+            }
         }
 
 
         public ObservableCollection<Dossier> InitFolderType()
         {
+            GlobalDict _dict = GlobalDict._dict;
+
             ObservableCollection<Dossier> ListeDossiersType = new ObservableCollection<Dossier>();
 
             for (int i = 0; i < _dict.DossierTypeIconDict.Count(); ++i)
@@ -221,6 +413,7 @@ namespace DotAgenda.MethodClass
 
         public void SetCurrentDate()
         {
+            GestionnaireEvent _global = GestionnaireEvent._global;
 
             int numY = _global._currentDay.Date.Year - DateTime.Today.Year + 1;
             int numM = _global._currentDay.Date.Month - 1;
@@ -234,7 +427,7 @@ namespace DotAgenda.MethodClass
         {
             try
             {
-                return _dict.DictClasse[NomClasse];
+                return GlobalDict._dict.DictClasse[NomClasse];
             }
 
             catch { return null; }
@@ -242,6 +435,8 @@ namespace DotAgenda.MethodClass
 
         public void ChangeEtatTache(TodoItem Tache)
         {
+            GestionnaireEvent _global = GestionnaireEvent._global;
+
             int numY = Tache.DateDebut.Year - DateTime.Today.Year + 1;
 
             int new_index = _prim.FindTodoIndex(Tache);
@@ -253,5 +448,16 @@ namespace DotAgenda.MethodClass
             _prim.SetCurrentDate();
         }
 
+        public int BoolToInt(bool val)
+        {
+            if (val == true) return 1;
+            else return 0;
+        }
+
+        public bool IntToBool(int val)
+        {
+            if (val == 1) return true;
+            else return false;
+        }
     }
 }

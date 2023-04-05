@@ -69,12 +69,12 @@ namespace DotAgenda.Models
             try
             {
                 FileInfo fi = new FileInfo(Nom);
-                Type = _global._dict.ExtensionDict[fi.Extension];
+                Type = GlobalDict._dict.ExtensionDict[fi.Extension];
             }
 
             catch
             {
-                Type = _global._dict.ExtensionDict["null"];
+                Type = GlobalDict._dict.ExtensionDict["null"];
             }
 
             if(DateAjout != default(DateTime))
@@ -82,8 +82,16 @@ namespace DotAgenda.Models
 
             AttachedEvent = new List<EventDay>();
 
+            AddToFileList();
             AddToFolderType();
-            _global.ListeFichiers.Add(this);
+        }
+
+        public void AddToFileList()
+        {
+            if(_global.ListeFichiers.IndexOf(this)==-1)
+            {
+                _global.ListeFichiers.Add(this);
+            }
         }
 
         public void AddToFolderType()

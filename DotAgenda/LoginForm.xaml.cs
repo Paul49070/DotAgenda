@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using DotAgenda.MethodClass.DataBaseMethods;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,11 @@ using System.Net.Mail;
 using Microsoft.SqlServer.Management.Smo;
 using System.Net;
 using System.Windows.Media.Animation;
+using DotAgenda.MethodClass;
+using System.Windows.Forms;
+using Windows.System;
+using MessageBox = System.Windows.MessageBox;
+using Newtonsoft.Json.Linq;
 
 namespace DotAgenda
 {
@@ -71,278 +77,107 @@ namespace DotAgenda
 
         private void MailTXT_GotFocus(object sender, RoutedEventArgs e)
         {
-            BorderMail.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(Application.Current.Resources["Contrast"].ToString()));
+            BorderMail.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(System.Windows.Application.Current.Resources["Contrast"].ToString()));
         }
 
         private void MailTXT_LostFocus(object sender, RoutedEventArgs e)
         {
-            BorderMail.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(Application.Current.Resources["Tertiary"].ToString()));
+            BorderMail.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(System.Windows.Application.Current.Resources["Tertiary"].ToString()));
 
         }
 
         //Focus Event
 
-
-
-        private void RememberConnection()
-        {
-            string requete = "select * From user where EstConnecte = 1";
-
-            SQLiteConnection connection = new SQLiteConnection("Data Source =" + SystemDB_path);
-            connection.Open();
-
-            SQLiteCommand command = new SQLiteCommand(requete, connection);
-
-            SQLiteDataReader reader = command.ExecuteReader();
-
-            //On récupère toutes les infos
-
-
-            while (reader.Read())
-            {
-                if (reader["SupportdeConnection"].ToString() == Environment.MachineName)
-                {
-                    WrongIDTXT.Visibility = Visibility.Hidden;
-
-                    App.ID = int.Parse(reader["ID"].ToString());
-
-                    DialogResult = true;
-                }
-            }
-        }
         private void LoginSubmit(object sender, RoutedEventArgs e)
         {
-            string mdp=mdpTXT.Password.ToString();
-            string username = MailTXT2.Text;
-
             bool UserFinded = false;
-
-            string requete = "SELECT ID FROM User WHERE Username = @user AND Password = @mdp";
-
-            SQLiteConnection connection = new SQLiteConnection("Data Source =" + SystemDB_path);
-            connection.Open();
-
-            SQLiteParameter p1 = new SQLiteParameter("user", username);
-            SQLiteParameter p2 = new SQLiteParameter("mdp", mdp);
-
-            SQLiteCommand command = new SQLiteCommand(requete, connection);
-
-            command.Parameters.Add(p1);
-            command.Parameters.Add(p2);
-
-            SQLiteDataReader reader = command.ExecuteReader();
-
-            //On cherche l'utilisateur correspondant
-
-            while (reader.Read())
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
             {
-                UserFinded = true;
-                WrongIDTXT.Visibility = Visibility.Hidden;           
-                App.ID = Convert.ToInt32(reader["ID"]);
+                connection.Open();
+                using(SQLiteCommand command = new SQLiteCommand("SELECT ID FROM User WHERE Mail = @user AND Password = @mdp", connection))
+                {
+                    command.Parameters.AddWithValue("user", MailTXT2.Text);
+                    command.Parameters.AddWithValue("mdp", mdpTXT.Password.ToString());
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if(reader.Read())
+                        {
+                            UserFinded = true;
+                            WrongIDTXT.Visibility = Visibility.Hidden;
+                            App.ID = reader.GetInt32(0);
+                        }
+                    }
+                }
             }
 
-            if (UserFinded)
-            {
-                requete = "UPDATE User SET EstConnecte = @connection WHERE ID = @id";
-
-                int RememberConnection;
-                if (CheckBoxResterConnecter.IsChecked == true) RememberConnection = 1;
-                else RememberConnection = 0;
-
-                SQLiteParameter par1 = new SQLiteParameter("connection", RememberConnection);
-                SQLiteParameter par2 = new SQLiteParameter("id", App.ID);
-
-                SQLiteCommand commandUPDATE = new SQLiteCommand(requete, connection);
-
-                commandUPDATE.Parameters.Add(par1);
-                commandUPDATE.Parameters.Add(par2);
-
-                commandUPDATE.ExecuteNonQuery();
-                UpdateConnectionDB();
-                DialogResult = true;
-            }
-
-            //Si aucun utilisateur de correspond
-
-            if(UserFinded==false)
+            if (!UserFinded)
             {
                 WrongIDTXT.Visibility = Visibility.Visible;
             }
+
+            else
+            {
+                UpdateConnectionDB();
+                DialogResult = true;
+            }
         }
+
 
         private void UpdateConnectionDB()
         {
-            string requete = "UPDATE User SET EstConnecte = @connecte where (id!=@id)";
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("UPDATE User SET EstConnecte = 0 where (id!=@id)", connection))
+                {
+                    command.Parameters.AddWithValue("id", App.ID);
+                    command.ExecuteNonQuery();
+                }
 
-            SQLiteConnection connection = new SQLiteConnection("Data Source =" + SystemDB_path);
-            connection.Open();
-            SQLiteCommand command_UseId = new SQLiteCommand(requete, connection);
+                using (SQLiteCommand command_Update = new SQLiteCommand("UPDATE User SET EstConnecte = @connection WHERE ID = @id", connection))
+                {
+                    int RememberConnection;
+                    if (CheckBoxResterConnecter.IsChecked == true) RememberConnection = 1;
+                    else RememberConnection = 0;
 
-            int temp = 0;
+                    command_Update.Parameters.AddWithValue("connection", RememberConnection);
+                    command_Update.Parameters.AddWithValue("id", App.ID);
 
-            SQLiteParameter tempID = new SQLiteParameter("id", App.ID);
-            SQLiteParameter tempconnecte = new SQLiteParameter("connecte", temp);
-            command_UseId.Parameters.Add(tempID);
-            command_UseId.Parameters.Add(tempconnecte);
-            command_UseId.ExecuteNonQuery();
+                    command_Update.ExecuteNonQuery();
+                }
+            }
         }
 
         private void AddUser()
         {
-            //Pour UserDB
-
-            string nom=NomTXT.Text, prenom=PrenomTXT.Text;
-
-            //Pour system db
-
+            string nom = NomTXT.Text;
+            string prenom=PrenomTXT.Text;
             string mdp = mdpTXT2.Password;
-            string username = MailTXT.Text;
-            int ResterConnecter;
+            string mail = MailTXT.Text;
 
-            if (CheckBoxResterConnecter.IsChecked == true) ResterConnecter = 1;
-            else ResterConnecter = 0;
+            int ResterConnecter = Primitives._prim.BoolToInt((bool)CheckBoxResterConnecter.IsChecked);
 
-            string requete = "INSERT INTO User (Username, Password, EstConnecte, SupportdeConnection) VALUES (@user, @mdp, @connecter, @appareil)";
+            using(SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                DataBase._db.AddUser(connection, mail, mdp, ResterConnecter);
+                App.ID = DataBase._db.GetUserID(connection, mail, mdp);
 
-            SQLiteConnection connection = new SQLiteConnection("Data Source =" + SystemDB_path);
-            connection.Open();
+                if (App.ID == -1)
+                {
+                    //throw exception
+                }
 
-            //Ajout dans base de donnée
+                DataBase._db.AddUserDetails(connection, prenom, nom, mail);
+                DataBase._db.AddDefaultClasseDB(connection);
 
-            SQLiteParameter p1 = new SQLiteParameter("user", username);
-            SQLiteParameter p2 = new SQLiteParameter("mdp", mdp);
-            SQLiteParameter p1bis = new SQLiteParameter("connecter", ResterConnecter);
-            SQLiteParameter p2bis = new SQLiteParameter("appareil", Environment.MachineName);
+                UpdateConnectionDB();
+                SendMail(mail);
 
-            SQLiteCommand command_Add = new SQLiteCommand(requete, connection);
 
-            command_Add.Parameters.Add(p1);
-            command_Add.Parameters.Add(p2);
-            command_Add.Parameters.Add(p1bis);
-            command_Add.Parameters.Add(p2bis);
-
-            command_Add.ExecuteNonQuery();
-
-            //On récupère l'ID de l'utilisateur créé
-
-            requete = "SELECT ID FROM User where Username = @user AND Password = @mdp";
-
-            SQLiteCommand command_SelectID = new SQLiteCommand(requete, connection);
-
-            command_SelectID.Parameters.Add(p1);
-            command_SelectID.Parameters.Add(p2);
-
-            SQLiteDataReader reader2 = command_SelectID.ExecuteReader();
-
-            //On récupère toutes les infos
-
-            if(reader2.Read())
-            {   
-                App.ID = int.Parse(reader2["ID"].ToString());
+                DialogResult = true;
             }
-
-            UpdateConnectionDB();
-
-
-            //On créer la database du user
-
-            string CheminCreaDB = "UserDataBase/" + App.ID.ToString() + "_DataBase.db";
-
-            SQLiteConnection.CreateFile(@CheminCreaDB);
-
-            SQLiteConnection m_dbConnection = new SQLiteConnection("Data Source=" + CheminCreaDB + ";Version=3;");
-            m_dbConnection.Open();
-
-            //On créer les tables
-
-            //Classe
-
-            string sql = "create table Classe (Titre varchar(30), Couleur varchar(7), Icon varchar(30))";
-            SQLiteCommand cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-
-            //Les 3 classes par défault
-
-            sql = "INSERT INTO Classe (Titre, Couleur, Icon) Values('Important','#ff4f78','AlertCircleOutline')";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-            sql = "INSERT INTO Classe (Titre, Couleur, Icon) Values('Loisir','#4fa2ff','RobotHappyOutline')";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-            sql = "INSERT INTO Classe (Titre, Couleur, Icon) Values('Cours','#FFB93F','BookOutline')";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-            sql = "INSERT INTO Classe (Titre, Couleur, Icon) Values('Divers','#3fff92','ArchiveOutline')";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-
-            //Evenement
-
-            sql = "create table Evenement (Titre varchar(30), Classe char(30), Description varchar(600), Localisation varchar(200), ID INTEGER, DateDebut varchar(100), DateFin varchar(100), PRIMARY KEY(ID))";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-            //Todo
-
-            sql = "create table Todo (Titre varchar(30), Projet varchar(30), Etat INTEGER, Date varchar(50), ID INTEGER, PRIMARY KEY(ID))";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-            //Fichiers
-
-            sql = "create table Fichiers (Nom varchar(200), DateAjout varchar(50), ID INTEGER, PRIMARY KEY(ID))";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-            //FichiersEvents
-
-            sql = "create table FileEvent (IDfile INTEGER, IDevent INTEGER)";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-            //DossiersPersos
-
-            sql = "create table Dossiers (Nom varchar(200), Icon varchar(50), Couleur varchar(10), ID INTEGER, PRIMARY KEY(ID))";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-            //Profil
-
-            sql = "create table Profil (Prenom varchar(30), Nom varchar(30), ID INTEGER, Mail varchar(30), LightMode integer, MailAllow integer, NotificationAllow integer, PRIMARY KEY(ID))";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-            cmd_AddTable.ExecuteNonQuery();
-
-            sql = "INSERT INTO Profil (Prenom, Nom, ID, Mail, LightMode, MailAllow, NotificationAllow) VALUES(@prenom, @nom, @id, @mail, @light, @MA, @NA)";
-            cmd_AddTable = new SQLiteCommand(sql, m_dbConnection);
-
-            p1 = new SQLiteParameter("prenom", prenom);
-            p2 = new SQLiteParameter("nom", nom);
-
-
-            SQLiteParameter p3 = new SQLiteParameter("id", App.ID);
-            SQLiteParameter p4 = new SQLiteParameter("mail", username);
-            SQLiteParameter p5 = new SQLiteParameter("light", 0);
-            SQLiteParameter p6 = new SQLiteParameter("MA", 1);
-            SQLiteParameter p7 = new SQLiteParameter("NA", 1);
-
-            cmd_AddTable.Parameters.Add(p1);
-            cmd_AddTable.Parameters.Add(p2);
-            cmd_AddTable.Parameters.Add(p3);
-            cmd_AddTable.Parameters.Add(p4);
-            cmd_AddTable.Parameters.Add(p5);
-            cmd_AddTable.Parameters.Add(p6);
-            cmd_AddTable.Parameters.Add(p7);
-
-            cmd_AddTable.ExecuteNonQuery();
-
-            m_dbConnection.Close();
-            SendMail(username);
-            DialogResult = true;
         }
 
         private void SendMail(string mailAdr)
@@ -487,7 +322,6 @@ namespace DotAgenda
         {
             WrongIDTXT.Visibility = Visibility.Hidden;
 
-
             Inscription.Visibility = Visibility.Visible;
             PasDeCompte.Visibility = Visibility.Hidden;
 
@@ -537,7 +371,6 @@ namespace DotAgenda
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            RememberConnection();
         }
 
         public static bool IsValidEmail(string email)

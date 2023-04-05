@@ -39,9 +39,9 @@ namespace DotAgenda.View
 
             _global = GestionnaireEvent._global;
 
-            _dict = _global._dict;
-            _db = _global._db;
-            _prim = _global._prim; ;
+            _dict = GlobalDict._dict;
+            _db = DataBase._db;
+            _prim = Primitives._prim;
 
             var _mainView = (MainWindow)Application.Current.MainWindow;
 
@@ -121,7 +121,7 @@ namespace DotAgenda.View
 
             //var lst_temp = ListViewDay.Items[pos];
 
-            Console.WriteLine(btn);
+            //Console.WriteLine(btn);
 
             /*var event_window = new MoreEventPage(_mainView.semaine[0].ListeEvent[pos], pos);
             event_window.Owner = Window.GetWindow(this);

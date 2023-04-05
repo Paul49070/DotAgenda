@@ -12,14 +12,17 @@ namespace DotAgenda.Models
         public bool Bisextile
         {
             get { return _Bisextile; }
-            set { _Bisextile = value; }
         }
 
         private int _Num;
         public int Num
         {
             get { return _Num; }
-            set { _Num = value; }
+            set 
+            { 
+                _Num = value;
+                _Bisextile = DateTime.IsLeapYear(_Num);
+            }
         }
 
 

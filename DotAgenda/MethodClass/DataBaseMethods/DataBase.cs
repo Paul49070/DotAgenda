@@ -7,6 +7,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Media3D;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
@@ -17,145 +18,165 @@ namespace DotAgenda.MethodClass.DataBaseMethods
         private static readonly DataBase db = new DataBase();
 
         public static DataBase _db => db;
-
-        public GestionnaireEvent _global;
-        public GlobalDict _dict;
-        public Primitives _prim;
-
-        public DataBaseFile File;
-        public DataBaseEvents Event;
-        public DataBaseTodo Todo;
-
-        private DataBase()
+        protected DataBase()
         {
         }
 
         public void InitProfil()
         {
-            SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path);
-            connection.Open();
+            bool bmail = true, notif = true, light = true;
+            string prenom = "", nom = "", mail = "";
 
-            string requete = "SELECT * from Profil WHERE ID=@id";
-
-            SQLiteCommand command = new SQLiteCommand(requete, connection);
-
-            command.Parameters.AddWithValue("id", App.ID);
-            SQLiteDataReader reader = command.ExecuteReader();
-
-            //On récupère toutes les infos
-
-            bool light = false, bmail = false, notif = false;
-            string mail = "", prenom = "", nom = "";
-
-            while (reader.Read())
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
             {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * from UserDetails WHERE UserID=@id", connection))
+                {
+                    command.Parameters.AddWithValue("id", App.ID);
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            bmail = reader.GetBoolean(1);
+                            notif = reader.GetBoolean(2);
+                            light = reader.GetBoolean(3);
 
+                            prenom = reader.GetString(4);
+                            nom = reader.GetString(5);
+                            mail = reader.GetString(6);
+                        }
 
-                prenom = reader["Prenom"].ToString();
-                nom = reader["Nom"].ToString();
-                mail = reader["Mail"].ToString();
-
-
-                if (reader["LightMode"].ToString() == "0")
-                    light = false;
-                else
-                    light = true;
-
-
-                if (reader["MailAllow"].ToString() == "0")
-                    bmail = false;
-                else bmail = true;
-
-
-                if (reader["NotificationAllow"].ToString() == "0")
-                    notif = false;
-
-                else notif = true;
+                        else
+                        {
+                            //Throw new exception
+                        }
+                    }
+                }
             }
 
-            //App.lightMode = light;
-            connection.Close();
-
-            string FirstLetterToUpper(string value)
-            {
-                string first_letter = value.ToString().Substring(0, 1);
-
-                string new_str = first_letter.ToUpper() + value.ToString().Substring(1);
-
-                return new_str;
-            }
-
-            App.User = new Profil(App.ID, light, bmail, notif, mail, FirstLetterToUpper(prenom), FirstLetterToUpper(nom));
+            App.User = new Profil(App.ID, light, bmail, notif, mail, prenom, nom);
         }
 
-
-        public List<ClasseEvent_item> InitClasse()
+        public void InitClasse()
         {
-            List<ClasseEvent_item> Classe = new List<ClasseEvent_item>();
-
-            SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path);
-            connection.Open();
-            SQLiteCommand command = new SQLiteCommand(connection);
-
-            command.CommandText = "SELECT * FROM Classe";
-            SQLiteDataReader reader = command.ExecuteReader();
-            string classe, icon;
-            while (reader.Read())
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
             {
-                classe = reader["Titre"].ToString();
-                icon = reader["Icon"].ToString();
-
-                Classe.Add(new ClasseEvent_item
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Classe", connection))
                 {
-                    Titre = classe,
-                    Couleur = reader["Couleur"].ToString(),
-                    Icon = icon
-                });
-            }
-
-            return Classe;
-
+                    using(SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                           new ClasseEvent_item(reader.GetString(2), reader.GetString(3), reader.GetString(4));
+                        }
+                    }
+                }
+            }          
         }
 
 
         public void Deconnect()
         {
-            string requete = "UPDATE User SET EstConnecte = @connecte where (id=@id)";
-
-            SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path);
-            connection.Open();
-            SQLiteCommand command_UseId = new SQLiteCommand(requete, connection);
-
-            SQLiteParameter tempID = new SQLiteParameter("id", App.ID);
-            SQLiteParameter tempconnecte = new SQLiteParameter("connecte", 0);
-            command_UseId.Parameters.Add(tempID);
-            command_UseId.Parameters.Add(tempconnecte);
-            command_UseId.ExecuteNonQuery();
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("UPDATE User SET EstConnecte = 0 where (id=@id)", connection))
+                {
+                    command.Parameters.AddWithValue("id", App.ID);
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
 
         public void ChangeLightDB(bool light)
         {
-            string requete = "UPDATE Profil SET LightMode = @light";
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("UPDATE UserDetails SET LightTheme = @light WHERE UserID = @id", connection))
+                {
+                    int lightBinaire;
+                    if (light == true)
+                        lightBinaire = 1;
 
-            SQLiteConnection c = new SQLiteConnection(App.SystemDB_Path);
-            c.Open();
+                    else lightBinaire = 0;
 
-            //Ajout dans base de donnée
+                    command.Parameters.AddWithValue("id", App.ID);
+                    command.Parameters.AddWithValue("light", lightBinaire);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
 
+        public void AddUser(SQLiteConnection connection, string mail, string mdp, int ResterConnecter)
+        {
+            using (SQLiteCommand command_Add = new SQLiteCommand("INSERT INTO User (Password, Mail, EstConnecte, SupportdeConnection) VALUES (@mdp, @user, @connecter, @appareil)", connection))
+            {
+                command_Add.Parameters.AddWithValue("user", mail);
+                command_Add.Parameters.AddWithValue("mdp", mdp);
+                command_Add.Parameters.AddWithValue("connecter", ResterConnecter);
+                command_Add.Parameters.AddWithValue("appareil", Environment.MachineName);
 
-            int lightBinaire;
-            if (light == true)
-                lightBinaire = 1;
+                command_Add.ExecuteNonQuery();
+            }
+        }
 
-            else lightBinaire = 0;
+        public int GetUserID(SQLiteConnection connection, string mail, string mdp)
+        {
+            using (SQLiteCommand command_Select = new SQLiteCommand("SELECT ID FROM User where Mail = @user AND Password = @mdp", connection))
+            {
+                command_Select.Parameters.AddWithValue("user", mail);
+                command_Select.Parameters.AddWithValue("mdp", mdp);
 
-            SQLiteCommand command_Add = new SQLiteCommand(requete, c);
-            SQLiteParameter p1 = new SQLiteParameter("light", lightBinaire);
+                using (SQLiteDataReader reader = command_Select.ExecuteReader())
+                {
+                    if (reader.Read())
+                        return reader.GetInt32(0);
+                }
+            }
 
-            command_Add.Parameters.Add(p1);
+            return -1;
+        }
 
-            command_Add.ExecuteNonQuery();
+        public void AddUserDetails(SQLiteConnection connection, string prenom, string nom, string mail)
+        {
+            using (SQLiteCommand command_Add_UserDetails = new SQLiteCommand("INSERT INTO UserDetails (UserID, MailAllow, NotificationAllow, LightTheme, Prenom, Nom, Mail) VALUES (@id, 0, 0, 0, @prenom, @nom, @mail)", connection))
+            {
+                string FirstLetterToUpper(string str)
+                {
+                    string first_letter = str.ToString().Substring(0, 1);
+
+                    string new_str = first_letter.ToUpper() + str.ToString().Substring(1);
+
+                    return new_str;
+                }
+
+                command_Add_UserDetails.Parameters.AddWithValue("id", App.ID);
+                command_Add_UserDetails.Parameters.AddWithValue("prenom", FirstLetterToUpper(prenom));
+                command_Add_UserDetails.Parameters.AddWithValue("nom", FirstLetterToUpper(nom));
+                command_Add_UserDetails.Parameters.AddWithValue("mail", mail);
+
+                command_Add_UserDetails.ExecuteNonQuery();
+            }
+        }
+
+        public void AddDefaultClasseDB(SQLiteConnection connection)
+        {
+            foreach (string[] str in App.ListeDefaultClasse)
+            {
+                using (SQLiteCommand command_Add_DefaultClass = new SQLiteCommand("INSERT INTO Classe (UserID, ID, Titre, Couleur, Icon) VALUES(@userId, @id, @titre, @couleur, @icon)", connection))
+                {
+                    command_Add_DefaultClass.Parameters.AddWithValue("userID", App.ID);
+                    command_Add_DefaultClass.Parameters.AddWithValue("id", Guid.NewGuid().ToString());
+                    command_Add_DefaultClass.Parameters.AddWithValue("titre", str[0]);
+                    command_Add_DefaultClass.Parameters.AddWithValue("couleur", str[1]);
+                    command_Add_DefaultClass.Parameters.AddWithValue("icon", str[2]);
+
+                    command_Add_DefaultClass.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

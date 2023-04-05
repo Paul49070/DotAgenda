@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,84 +18,83 @@ namespace DotAgenda
     /// </summary>
     public partial class App : Application
     {
-        public static int ID = -1;
+        public static int ID;
         public static Profil User;
-        
-        public static string SystemDB_Path = "DataSource =SystemDB.db";
+        public static DateTime LastDate = new DateTime(2026, 12, 31);
+        public static DateTime StartDate = new DateTime(2022, 01, 01);
 
-        public static string NameDB_System  {get;} = "SystemDB.db";
+        public static List<string[]> ListeDefaultClasse { get; } = new List<string[]>
+        {
+            new string[] { "Important", "#ff4f78", "AlertCircleOutline" },
+            new string[] { "Loisir", "#4fa2ff", "RobotHappyOutline" },
+            new string[] { "Cours", "#FFB93F", "BookOutline" },
+            new string[] { "Divers", "#3fff92", "ArchiveOutline" }
+        };
+
+        public static string SystemDB_Path { get; } = "DataSource =SystemDB.db";
 
         GestionnaireEvent _global;
         private void ApplicationStart(object sender, StartupEventArgs e)
         {
-
-
             Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-            var dialog = new LoginForm();
-
-            if (dialog.ShowDialog() == true)
+            if (!RememberConnection())
             {
-                InitGlobals();
+                var dialog = new LoginForm();
 
-                var mainWindow = new MainWindow();
-                //Re-enable normal shutdown mode.
-                Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
-                Current.MainWindow = mainWindow;
-                mainWindow.Show();
+                if (dialog.ShowDialog() == true)
+                    StartTheApp();
+                else
+                {
+                    MessageBox.Show("Problème de connexion", "Error", MessageBoxButton.OK);
+                    Current.Shutdown(-1);
+                }
             }
+
             else
+                StartTheApp();
+        }
+
+        private void StartTheApp()
+        {
+            InitGlobals();
+
+            var mainWindow = new MainWindow();
+            //Re-enable normal shutdown mode.
+            Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            Current.MainWindow = mainWindow;
+            mainWindow.Show();
+        }
+
+        private bool RememberConnection()
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(SystemDB_Path))
             {
-                MessageBox.Show("Unable to load data.", "Error", MessageBoxButton.OK);
-                Current.Shutdown(-1);
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("select ID From User where EstConnecte = 1 and SupportDeConnection = @support", connection))
+                {
+                    command.Parameters.AddWithValue("support", Environment.MachineName);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            ID = reader.GetInt32(0);
+                            return true;
+                        }
+
+                        return false;
+                    }
+                }
             }
         }
 
         private void InitGlobals()
         {
-
-            _global = GestionnaireEvent._global;
-            _global._currentDay.Date = DateTime.Today;
-
-            _global._db = DataBase._db;
-            _global._db._global = _global;
-            _global._db._dict = GlobalDict._dict;
-            _global._db._prim = Primitives._prim;
-            _global._db.InitProfil();
-
-
-            _global._db.File = DataBaseFile._dbFile;
-            _global._db.File._global = _global;
-            _global._db.File._dict = GlobalDict._dict;
-            _global._db.File._prim = Primitives._prim;
-            _global._db.File._db = DataBase._db;
-
-            _global._db.Event = DataBaseEvents._dbEvent;
-            _global._db.Event._global = _global;
-            _global._db.Event._dict = GlobalDict._dict;
-            _global._db.Event._prim = Primitives._prim;
-            _global._db.Event._db = DataBase._db;
-
-            _global._db.Todo = DataBaseTodo._dbTodo;
-            _global._db.Todo._global = _global;
-            _global._db.Todo._dict = GlobalDict._dict;
-            _global._db.Todo._prim = Primitives._prim;
-            _global._db.Todo._db = DataBase._db;
-
-
-            GlobalDict._dict.InitAll(_global._db.InitClasse());
-            _global._dict = GlobalDict._dict;
-            _global._dict._db = _global._db;
-
-            _global._prim = Primitives._prim;
-            _global._prim._global = _global;
-            _global._prim._dict = _global._dict;
-            _global._prim._db = _global._db;
-
-
-            _global.ListeDossiersType = _global.InitFolderType();
-            _global.ListeFichiers = _global.InitListeFichiers();
-            _global.A = _global.InitArray();
+            GlobalDict._dict.InitAll();
+            DataBase._db.InitProfil();
+            DataBase._db.InitClasse();
+            GestionnaireEvent._global.Init();
         }
 
         public static void SwitchTheme(bool light)

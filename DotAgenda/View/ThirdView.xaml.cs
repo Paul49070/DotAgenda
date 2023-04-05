@@ -123,10 +123,9 @@ namespace DotAgenda.View
 
             _global = GestionnaireEvent._global;
 
-            _dict = _global._dict;
-            _db = _global._db;
-            _prim = _global._prim;
-
+            _dict = GlobalDict._dict;
+            _db = DataBase._db;
+            _prim = Primitives._prim;
 
 
             InitNbClasseJour();

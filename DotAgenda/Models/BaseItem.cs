@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DotAgenda.MethodClass;
 
 namespace DotAgenda.Models
 {
@@ -61,13 +58,15 @@ namespace DotAgenda.Models
         public string ID
         {
             get { return _ID; }
-            set { _ID = value; }
         }
 
 
-        public BaseItem(string ID, string titre, DateTime debut, DateTime fin, string description = "", string classe = "", bool fini = false)
+        public BaseItem(string titre, DateTime debut, DateTime fin, string ID = "null", string description = "", string classe = "", bool fini = false)
         {
-            this.ID = ID;
+            if (ID == "null")
+                this._ID = Primitives._prim.GenerateID();
+            else this._ID = ID;
+
             DateDebut = debut;
             DateFin = fin;
             Description = description;

@@ -72,5 +72,10 @@ namespace DotAgenda.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public CurrentDay()
+        {
+            this.Date = DateTime.Today;
+        }
     }
 }

@@ -1,15 +1,11 @@
-﻿using DotAgenda.View;
-using Microsoft.Maps.MapControl.WPF;
+﻿using DotAgenda.MethodClass;
+using DotAgenda.MethodClass.DataBaseMethods;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Devices.Geolocation;
+using System.Windows;
+
 
 namespace DotAgenda.Models
 {
@@ -39,11 +35,10 @@ namespace DotAgenda.Models
         }
 
 
-        private int _GroupID;
-        public int GroupID
+        private string _GroupID;
+        public string GroupID
         {
             get { return _GroupID; }
-            set { _GroupID = value; }
         }
         
 
@@ -64,17 +59,70 @@ namespace DotAgenda.Models
 
 
 
-        public EventDay(string id, string titre, DateTime startTime , DateTime endTime, string location, string description, string classe, bool visible = true) 
-            : base(id, titre, startTime, endTime, description, classe)
+        public EventDay(string titre, DateTime startTime , DateTime endTime, string classe, string ID = "null", string GroupID = "", string location = "", string desc = "", 
+            Reccurences reccurence = default, ObservableCollection<Fichier> fic = default, bool visible = true) 
+            : base(titre, startTime, endTime, ID, desc, classe)
         {        
             Lieu = location;        
             IsVisible = visible;
-            Reccurence = new Reccurences();
-            Fichiers = new ObservableCollection<Fichier>();
 
+            if (reccurence == default)
+                Reccurence = new Reccurences();
+            else Reccurence = reccurence;
+
+            if (fic == default)
+                Fichiers = new ObservableCollection<Fichier>();
+            else Fichiers = fic;
+
+            _GroupID = GroupID;
+
+            if(this.GroupID != "")
+            {
+                try 
+                {
+                    GlobalDict._dict.DictGroupEvent[this.GroupID].AddEventToListe(this);
+                }
+
+                catch
+                {
+                    new GroupEvent(this.GroupID, this);
+                }
+            }
+        }
+
+        public EventDay Clone(bool GenerateNewGroupID = false)
+        {
+            if(GenerateNewGroupID)
+                return new EventDay(Titre, DateDebut, DateFin, Classe, ID, Primitives._prim.GenerateID(), Lieu, Description, Reccurence, Fichiers, IsVisible);
+            else return new EventDay(Titre, DateDebut, DateFin, Classe, ID, GroupID, Lieu, Description, Reccurence, Fichiers, IsVisible);
 
         }
 
+        public void DeleteEventFromGroup()
+        {
+            if (this.GroupID != "")
+            {
+                try
+                {
+                    GlobalDict._dict.DictGroupEvent[this.GroupID].DeleteEventFromListe(this);
+                }
+
+                catch
+                {
+                }
+            }
+        }
+
+        public void RemoveEvent()
+        {
+            int numY = DateDebut.Year - DateTime.Today.Year + 1;
+            int numM = DateDebut.Month - 1;
+            int numJ = DateDebut.Day - 1;
+
+            DeleteEventFromGroup();
+            GestionnaireEvent._global.A[numY].M[numM].J[numJ].DeleteEventToList(this);
+            DataBaseEvents._dbEvent.DeleteEventToDB(this);
+        }
 
         public bool AddFile(Fichier file)
         {
@@ -116,26 +164,26 @@ namespace DotAgenda.Models
 
         public class Reccurences
         {
-            public Frequency Frequency;
+            public RepeatType Repeat;
             public int ForXtime;
             public int EveryXtime; //Tout les 3 jours pour 5 fois : ForXtime = 5, EveryXtime = 3 avec frequency en daily
 
             public Reccurences()
             {
-                Frequency = Frequency.JustOneTime;
+                Repeat = RepeatType.None;
                 ForXtime = -1; // -> infini
                 EveryXtime = 1;
             }
         }
 
 
-        public enum Frequency
+        public enum RepeatType
         {   
             Daily = 0,
             Weekly = 1,
             Monthly = 2,
             Yearly = 3,
-            JustOneTime = -1,
+            None = -1,
         }
 
 

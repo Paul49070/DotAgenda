@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DotAgenda.View"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
         mc:Ignorable="d"
         ResizeMode="NoResize"
@@ -13,7 +12,8 @@
         AllowsTransparency="True"
         ShowInTaskbar="False"
         xmlns:fileConverter="clr-namespace:DotAgenda.View.Converter"
-
+        xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+        
         WindowStartupLocation="CenterOwner"
         SizeToContent="Height" 
         Width="650" 
@@ -220,42 +220,42 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
 
-                            
-
-                            <TextBox x:Name="TitreEvent" Margin="0,25,0,0"
+                                <TextBox x:Name="TitreEvent" Margin="0,25,0,0"
                          Background="Transparent" TextWrapping = "NoWrap"
                          BorderThickness="0,0,0,2" Padding="5,0,5,0" FontSize="15" Foreground="{DynamicResource Font}"
                          HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins">
-                                <TextBox.Style>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type TextBox}">
-                                                    <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                        <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsEnabled" Value="false">
-                                                            <Setter Property="Opacity" TargetName="border" Value="1"/>
-                                                        </Trigger>
-                                                        <Trigger Property="IsMouseOver" Value="true">
-                                                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                        </Trigger>
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type TextBox}">
+                                                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsEnabled" Value="false">
+                                                                <Setter Property="Opacity" TargetName="border" Value="1"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsMouseOver" Value="true">
+                                                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
+                                                            </Trigger>
 
-                                                        <Trigger Property="IsMouseOver" Value="False">
-                                                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                        </Trigger>
+                                                            <Trigger Property="IsMouseOver" Value="False">
+                                                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
+                                                            </Trigger>
 
-                                                        <Trigger Property="IsFocused" Value="true">
-                                                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </TextBox.Style>
-                            </TextBox>
+                                                            <Trigger Property="IsFocused" Value="true">
+                                                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+
+
 
 
                             <DatePicker Style="{DynamicResource styleDatePicker}" 

@@ -1,5 +1,6 @@
 ﻿using DotAgenda.Models;
 using DotAgenda.ViewModels;
+using Microsoft.Maps.MapControl.WPF;
 using Microsoft.SqlServer.Management.XEvent;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Windows;
 
 namespace DotAgenda.MethodClass.DataBaseMethods
 {
@@ -15,13 +17,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
     {
         private static readonly DataBaseEvents dbEvent = new DataBaseEvents();
         public static DataBaseEvents _dbEvent => dbEvent;
-
-        public DataBase _db;
-        public Primitives _prim;
-        public GlobalDict _dict;
-        public GestionnaireEvent _global;
-
-        private DataBaseEvents()
+        protected DataBaseEvents()
         {
         }
 
@@ -30,27 +26,28 @@ namespace DotAgenda.MethodClass.DataBaseMethods
             using (var connection = new SQLiteConnection(App.SystemDB_Path))
             {
                 connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Evenement UserID = @userID", connection))
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Evenement WHERE UserID = @userID", connection))
                 {
                     command.Parameters.AddWithValue("userID", App.User.id);
 
                     int numY;
-                    string titre, classe, description, loc, ID;
+                    string titre, classe, description, loc, ID, GroupID;
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
                             ID = reader.GetString(1);
-                            titre = reader.GetString(2);
-                            classe = reader.GetString(3);
-                            description = reader.GetString(4);
-                            loc = reader.GetString(5);
+                            GroupID = reader.GetString(2);
+                            titre = reader.GetString(3);
+                            classe = reader.GetString(4);
+                            description = reader.GetString(5);
+                            loc = reader.GetString(6);
 
-                            if (DateTime.TryParse(reader.GetString(6), out DateTime debut) && DateTime.TryParse(reader.GetString(7), out DateTime fin))
+                            if (DateTime.TryParse(reader.GetString(7), out DateTime debut) && DateTime.TryParse(reader.GetString(8), out DateTime fin))
                             {
                                 numY = debut.Year - DateTime.Today.Year + 1;
 
-                                _global.A[numY].M[debut.Month - 1].J[debut.Day - 1].AddEventToList(new EventDay(ID, titre, debut, fin, loc, description, classe));
+                                GestionnaireEvent._global.A[numY].M[debut.Month - 1].J[debut.Day - 1].AddEventToList(new EventDay(titre, debut, fin, classe, ID, GroupID, location:loc, desc:description));
                             }
                         }
                     }
@@ -77,7 +74,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
                             {
 
                                 int year = start.Year - DateTime.Today.Year + 1;
-                                foreach (EventDay eventDay in _global.A[year].M[start.Month - 1].J[start.Day - 1].ListeEvent)
+                                foreach (EventDay eventDay in GestionnaireEvent._global.A[year].M[start.Month - 1].J[start.Day - 1].ListeEvent)
                                 {
                                     if (eventDay.ID == ID)
                                         return eventDay;
@@ -111,7 +108,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
                             ID_file = reader["IDfile"].ToString();
 
                             EventDay e = GetEventWithID(ID_event);
-                            Fichier f = _db.File.GetFileWithID(ID_file);
+                            Fichier f = DataBaseFile._dbFile.GetFileWithID(ID_file);
 
                             if (e.Titre != null && f.Nom != null)
                                 e.AddFile(f);
@@ -126,11 +123,12 @@ namespace DotAgenda.MethodClass.DataBaseMethods
             using(var connection = new SQLiteConnection(App.SystemDB_Path))
             {
                 connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand("UPDATE Evenement Set Classe = @classe, Titre = @titre, DateDebut = @debut, DateFin = @fin, Description = @description, Localisation = @loc " +
+                using (SQLiteCommand command = new SQLiteCommand("UPDATE Evenement Set GroupID = @groupID, Classe = @classe, Titre = @titre, DateDebut = @debut, DateFin = @fin, Description = @description, Localisation = @loc " +
                     "WHERE ID = @id and UserID = @userID", connection))
                 {
-                    command.Parameters.AddWithValue("userID", App.User.id);
+                    command.Parameters.AddWithValue("userID", App.ID);
                     command.Parameters.AddWithValue("id", nvx.ID);
+                    command.Parameters.AddWithValue("groupID", nvx.GroupID);
                     command.Parameters.AddWithValue("titre", nvx.Titre);
                     command.Parameters.AddWithValue("classe", nvx.Classe);
                     command.Parameters.AddWithValue("debut", nvx.DateDebut.ToString());
@@ -169,11 +167,12 @@ namespace DotAgenda.MethodClass.DataBaseMethods
             {
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand("INSERT INTO " +
-                    "Evenement (UserID, ID, Titre, Classe, Description, Localisation, DateDebut, DateFin) " +
-                    "VALUES (@userID, @id, @titre, @classe, @description, @lieu, @debut, @fin)", connection))
+                    "Evenement (UserID, ID, GroupID, Titre, Classe, Description, Localisation, DateDebut, DateFin) " +
+                    "VALUES (@userID, @id, @groupID, @titre, @classe, @description, @lieu, @debut, @fin)", connection))
                 {
                     command.Parameters.AddWithValue("@userID", App.User.id);
                     command.Parameters.AddWithValue("@id", EventAdd.ID);
+                    command.Parameters.AddWithValue("@groupID", EventAdd.GroupID);
                     command.Parameters.AddWithValue("@titre", EventAdd.Titre);
                     command.Parameters.AddWithValue("@classe", EventAdd.Classe);
                     command.Parameters.AddWithValue("@description", EventAdd.Description);
@@ -185,6 +184,40 @@ namespace DotAgenda.MethodClass.DataBaseMethods
             }
 
             return true;
+        }
+
+        public void DeleteGroupEvent(EventDay EventRemove, DateTime fromThisDate = default, bool ExceptSender = false)
+        {
+            using (var connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using (SQLiteCommand commandFileEvent = new SQLiteCommand(connection))
+                {
+                    if (ExceptSender)
+                    {
+                        MessageBox.Show(fromThisDate.ToString());
+                        commandFileEvent.CommandText = "DELETE FROM FileEvent WHERE IDevent in (SELECT ID FROM Evenement WHERE UserID=@userID and GroupID=@groupID and DateDebut > @date and ID != @id)";
+                        commandFileEvent.Parameters.AddWithValue("@id", EventRemove.ID);
+                    }
+
+                    else
+                        commandFileEvent.CommandText = "DELETE FROM FileEvent WHERE IDevent in (SELECT ID FROM Evenement WHERE UserID=@userID and GroupID=@groupID and DateDebut > @date";
+
+                    commandFileEvent.Parameters.AddWithValue("@userID", App.User.id);
+                    commandFileEvent.Parameters.AddWithValue("@groupID", EventRemove.GroupID);
+                    commandFileEvent.Parameters.AddWithValue("@date", fromThisDate.ToString("yyyy-MM-dd HH:mm:ss"));
+                    commandFileEvent.ExecuteNonQuery();
+
+
+                    if (ExceptSender)
+                        commandFileEvent.CommandText = "DELETE FROM Evenement WHERE UserID=@userID and GroupID=@groupID and DateDebut > @date and ID != @id";
+
+                    else commandFileEvent.CommandText = "DELETE FROM Evenement WHERE UserID=@userID and GroupID=@groupID and DateDebut > @date";
+
+
+                    commandFileEvent.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

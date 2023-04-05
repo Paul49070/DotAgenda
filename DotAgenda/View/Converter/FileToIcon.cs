@@ -21,8 +21,6 @@ namespace DotAgenda.View.Converter
 
             FileInfo fi = new FileInfo((string)value);
 
-            Console.WriteLine(fi.Extension);
-
             try
             {
                 return _dict.DossierTypeIconDict[_dict.ExtensionDict[fi.Extension]][1];

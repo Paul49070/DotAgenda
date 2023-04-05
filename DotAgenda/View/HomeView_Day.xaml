@@ -6,6 +6,7 @@
              mc:Ignorable="d" 
              xmlns:local="clr-namespace:DotAgenda.View.Converter"
              d:DesignHeight="550" d:DesignWidth="820"
+             xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
              xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf">
 
     <UserControl.Resources>
@@ -144,8 +145,6 @@
                                      FontSize="18"/>
                         </Border>
                     </Grid>
-
-
 
 
                     <ScrollViewer  Margin="0,0,5,7" x:Name="scrollviewer" ScrollViewer.HorizontalScrollBarVisibility="Disabled"

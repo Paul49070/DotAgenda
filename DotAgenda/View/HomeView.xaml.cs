@@ -44,9 +44,9 @@ namespace DotAgenda.View
         {
             _global = GestionnaireEvent._global;
 
-            _dict = _global._dict;
-            _db = _global._db;
-            _prim = _global._prim;
+            _dict = GlobalDict._dict;
+            _db = DataBase._db;
+            _prim = Primitives._prim;
 
             InitializeComponent();
 
@@ -59,6 +59,9 @@ namespace DotAgenda.View
             {
                 ClasseChecked.Add(classe, true);
             }
+
+            Calendrier.DisplayDateStart = App.StartDate;
+            Calendrier.DisplayDateEnd = App.LastDate;
         }
 
         void AddClassToView(object sender, RoutedEventArgs e)

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DotAgenda.MethodClass;
+using DotAgenda.MethodClass.DataBaseMethods;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Protocols.WSTrust;
 using System.Linq;
@@ -44,16 +46,31 @@ namespace DotAgenda.Models
         }
 
 
-        public TodoItem(string titre, DateTime debut, string classe, bool fini, string ID, string description = "", 
+        public TodoItem(string titre, DateTime debut, string classe, bool fini, string ID = "null", string description = "", 
             Priorite priorite = Priorite.Medium, States status = States.NotStarted, DateTime fin = default)
 
-            :base(ID,titre,debut,fin,description,classe,fini)
+            :base(titre,debut,fin, ID, description,classe,fini)
         {
             Priority = priorite;
             Status = status;
 
             Labels = new List<Label>();
             ModifiedDate = DateTime.Now;
+
+            AddTodoToDay();
+        }
+
+        public void AddTodoToDay()
+        {
+            int index = Primitives._prim.FindTodoIndex(this);
+            int year = DateDebut.Year - DateTime.Today.Year + 1;
+
+            GestionnaireEvent._global.A[year].M[DateDebut.Month - 1].J[DateDebut.Day - 1].AjouterTodoToList(index, this);
+        }
+
+        public void AjouterTodoToDB()
+        {
+            DataBaseTodo._dbTodo.AjouterTodo(this);
         }
 
 

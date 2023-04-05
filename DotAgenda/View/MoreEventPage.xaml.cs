@@ -38,6 +38,14 @@ namespace DotAgenda.View
         Primitives _prim;
 
 
+        Dictionary<string, RepeatType> DictRepeat = new Dictionary<string, RepeatType>
+            {
+                { "jours", RepeatType.Daily },
+                { "semaines", RepeatType.Weekly },
+                { "mois", RepeatType.Monthly },
+                { "ans", RepeatType.Yearly }
+            };
+
         public MoreEventPage(EventDay DetailOne)
         {
             var _mainView = (MainWindow)Application.Current.MainWindow;
@@ -45,17 +53,16 @@ namespace DotAgenda.View
 
             _global = GestionnaireEvent._global;
 
-            _dict = _global._dict;
-            _db = _global._db;
-            _prim = _global._prim;
+            _dict = GlobalDict._dict;
+            _db = DataBase._db;
+            _prim = Primitives._prim;
 
 
             InitializeComponent();
 
             _currentEvent = DetailOne;
 
-
-            _newEvent = new EventDay(DetailOne.ID, DetailOne.Titre, DetailOne.DateDebut, DetailOne.DateFin, DetailOne.Lieu, DetailOne.Description, DetailOne.Classe);
+            _newEvent = _currentEvent.Clone();
 
             ListeView_File.ItemsSource = _currentEvent.Fichiers;
 
@@ -65,7 +72,11 @@ namespace DotAgenda.View
             TitreEvent.Text = _currentEvent.Titre;
             DescriptionTXT.Text = _currentEvent.Description;
 
+
             AdvancedOptionCheck.IsChecked = false;
+            ReccurenceCheck.IsChecked = _currentEvent.Reccurence.Repeat != RepeatType.None;
+
+            Frequency.Text = _currentEvent.Reccurence.EveryXtime.ToString();
 
             SH_all(false);
             SetSideBorder();
@@ -78,17 +89,14 @@ namespace DotAgenda.View
 
         public void SetReccurence()
         {
-            List<string> frequencyToString = new List<string>
-            {
-                "jours",
-                "semaines",
-                "mois",
-                "ans"
-            };
+            
 
-            int x  = (int)Enum.Parse(typeof(EventDay.Frequency), Enum.GetName(typeof(EventDay.Frequency), _currentEvent.Reccurence.Frequency));
+            List<string> repeatString = DictRepeat.Keys.ToList();
 
-            ReccurenceSelection.ItemsSource = frequencyToString;
+            //int x  = (int)Enum.Parse(typeof(EventDay.RepeatType), Enum.GetName(typeof(EventDay.RepeatType), _currentEvent.Reccurence.Repeat));
+            int x = repeatString.IndexOf(DictRepeat.FirstOrDefault(e => e.Value == _currentEvent.Reccurence.Repeat).Key);
+
+            ReccurenceSelection.ItemsSource = repeatString;
 
             if (x != -1)
             {
@@ -167,47 +175,79 @@ namespace DotAgenda.View
             
         }
 
-        private bool CheckFrequency()
+        private bool CheckFrequencyRegex()
         {
-            if(Regex.IsMatch(Frequency.Text.ToString(), "^[0-9]+$"))
+            if (ReccurenceCheck.IsChecked == true)
             {
-                try
+                if (Regex.IsMatch(Frequency.Text.ToString(), "^[0-9]+$"))
                 {
-                    return int.Parse(Frequency.Text.ToString())>0;
+                    try
+                    {
+                        return int.Parse(Frequency.Text.ToString()) > 0;
+                    }
+                    catch { }
                 }
-                catch { }
+
+                return false;
             }
 
-            return false;
+            return true;
+        }
+
+        public RepeatType GetRepeatType()
+        {
+            try
+            {
+                string selectedValue = ReccurenceSelection.SelectedItem.ToString();
+                return DictRepeat[selectedValue];
+            }
+
+            catch { }
+
+            return RepeatType.None;
         }
 
         private void Submit(object sender, RoutedEventArgs e)
         {
-            if (CheckFrequency())
+            if (CheckFrequencyRegex())
             {
+
+                Reccurences newReccurences = new Reccurences();
+
+                if (ReccurenceCheck.IsChecked == true)
+                {
+                    newReccurences.Repeat = GetRepeatType();
+                    newReccurences.EveryXtime = int.Parse(Frequency.Text.ToString());
+                }
+
+                else newReccurences.Repeat = RepeatType.None;
+
+               
+                var _mainView = (MainWindow)Application.Current.MainWindow;
+
+                _newEvent.Titre = TitreEvent.Text;
+                _newEvent.Fichiers = _currentEvent.Fichiers;
+
+                DateTime SelectDate = (DateTime)DatePickerEvent.SelectedDate;
+
+                int HeureDebut = int.Parse(Heure.SelectedItem.ToString().Substring(0, 2));
+                int MinuteDebut = int.Parse(Heure.SelectedItem.ToString().Substring(3, 2));
+
+                int HFin = int.Parse(HeureFin.SelectedItem.ToString().Substring(0, 2));
+                int MinuteFin = int.Parse(HeureFin.SelectedItem.ToString().Substring(3, 2));
+
+
+                _newEvent.DateDebut = new DateTime(SelectDate.Year, SelectDate.Month, SelectDate.Day, HeureDebut, MinuteDebut, 0);
+                _newEvent.DateFin = new DateTime(SelectDate.Year, SelectDate.Month, SelectDate.Day, HFin, MinuteFin, 0);
+
+                _newEvent.Description = DescriptionTXT.Text;
+                _newEvent.Reccurence = newReccurences;
+
+
                 if (_currentEvent != _newEvent)
                 {
 
-                    var _mainView = (MainWindow)Application.Current.MainWindow;
-
-                    _newEvent.Titre = TitreEvent.Text;
-                    _newEvent.Fichiers = _currentEvent.Fichiers;
-
-                    DateTime SelectDate = (DateTime)DatePickerEvent.SelectedDate;
-
-                    int HeureDebut = int.Parse(Heure.SelectedItem.ToString().Substring(0, 2));
-                    int MinuteDebut = int.Parse(Heure.SelectedItem.ToString().Substring(3, 2));
-
-                    int HFin = int.Parse(HeureFin.SelectedItem.ToString().Substring(0, 2));
-                    int MinuteFin = int.Parse(HeureFin.SelectedItem.ToString().Substring(3, 2));
-
-
-                    _newEvent.DateDebut = new DateTime(SelectDate.Year, SelectDate.Month, SelectDate.Day, HeureDebut, MinuteDebut, 0);
-                    _newEvent.DateFin = new DateTime(SelectDate.Year, SelectDate.Month, SelectDate.Day, HFin, MinuteFin, 0);
-
-                    _newEvent.Description = DescriptionTXT.Text;
-
-                    _prim.ModifEvent(_newEvent, _currentEvent, _global.A);
+                    _prim.ModifEvent(_newEvent, _currentEvent);
 
                     _mainView.HidePopup();
                     DialogResult = true;

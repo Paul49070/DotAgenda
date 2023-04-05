@@ -2,6 +2,7 @@
 using Microsoft.SqlServer.Management.XEvent;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 
 namespace DotAgenda.Models
@@ -23,6 +24,15 @@ namespace DotAgenda.Models
         {
             _global = GestionnaireEvent._global;
             Pourcentage = 0;
+            AddToClassDict();
+        }
+
+        private void AddToClassDict()
+        {
+            if (GlobalDict._dict.DictClasse.Keys.ToList().IndexOf(this.Titre) == -1)
+            {
+                GlobalDict._dict.DictClasse.Add(this.Titre, this);
+            }
         }
 
         public void Add(EventDay Event)

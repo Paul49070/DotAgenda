@@ -32,9 +32,9 @@ namespace DotAgenda.View.Popups
 
             _global = GestionnaireEvent._global;
 
-            _dict = _global._dict;
-            _db = _global._db;
-            _prim = _global._prim;
+            _dict = GlobalDict._dict;
+            _db = DataBase._db;
+            _prim = Primitives._prim;
 
             TitreEvent.LostFocus += TitreEvent_LostFocus;
             TitreEvent.GotFocus += TitreEvent_GotFocus;
@@ -149,13 +149,22 @@ namespace DotAgenda.View.Popups
 
             if (valide)
             {
-                string couleur = _dict.DictClasse[classe].Couleur;
+                EventDay EventToAdd;
 
-                EventDay EventAdd = new EventDay(_prim.GenerateID(), Titre, debut, fin, "", "", classe);
+                if (false)
+                    EventToAdd = new EventDay(Titre, debut, fin, classe, GroupID: _prim.GenerateID());
+
+                else EventToAdd = new EventDay(Titre, debut, fin, classe);
+
+                /*
+                EventToAdd.Reccurence.Repeat = EventDay.RepeatType.Yearly;
+                EventToAdd.Reccurence.EveryXtime = 1;
+                EventToAdd.Reccurence.ForXtime = -1;*/
+
+     
+
+                _prim.AddEvent(EventToAdd);
                 
-                _global.A[debut.Year - DateTime.Today.Year +1].M[debut.Month - 1].J[debut.Day-1].AjouterEvent(EventAdd);
-
-
                 Window parentWindow = Window.GetWindow(this);
                 parentWindow.Close();
             }

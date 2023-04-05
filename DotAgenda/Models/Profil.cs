@@ -10,8 +10,6 @@ namespace DotAgenda.Models
 {
     public class Profil
     {
-        DataBase _db = GestionnaireEvent._global._db;
-
         private int _id;
         public int id
         {

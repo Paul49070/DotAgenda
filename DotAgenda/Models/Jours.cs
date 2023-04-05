@@ -49,9 +49,9 @@ namespace DotAgenda.Models
         {
             _global = GestionnaireEvent._global;
 
-            _dict = _global._dict;
-            _db = _global._db;
-            _prim = _global._prim;
+            _dict = GlobalDict._dict;
+            _db = DataBase._db;
+            _prim = Primitives._prim;
 
             ListeEvent = new ObservableCollection<EventDay>();
             Todo = new ObservableCollection<TodoItem>();
@@ -65,7 +65,7 @@ namespace DotAgenda.Models
 
             EventAdd.Fini = _prim.Event_Fini(EventAdd.DateDebut);
 
-            bool HasBeenAdded = _db.Event.AddEventToDB(EventAdd);
+            bool HasBeenAdded = DataBaseEvents._dbEvent.AddEventToDB(EventAdd);
 
             if (HasBeenAdded)
             {
@@ -82,21 +82,6 @@ namespace DotAgenda.Models
 
             else Console.WriteLine("Evenement déjà présent dans la base de donnée.");
 
-        }
-
-        public void DeleteEvent(EventDay EventRemove)
-        {
-            var _mainView = (MainWindow)Application.Current.MainWindow;
-
-            if (DeleteEventToList(EventRemove))
-            {
-                _db.Event.DeleteEventToDB(EventRemove);
-
-                if (_mainView.ListeEventWeek.Count() > 0)
-                {
-                    _mainView.ListeEventWeek.Move(0, 1);
-                }
-            }
         }
 
 
@@ -158,13 +143,10 @@ namespace DotAgenda.Models
                     }
                 }
 
-                //Remove from class
-
-                int i = _dict.DictClasse.Keys.ToList().IndexOf(EventRemove.Classe);
-                //_mainView.Classe[i].Remove(EventRemove);
-
                 return true;
             }
+
+
             else
             {
                 Console.WriteLine("Evenement déjà retiré");
@@ -177,8 +159,6 @@ namespace DotAgenda.Models
         {
             if(Todo.IndexOf(TodoAdd) == -1)
             {
-                var _mainView = (MainWindow)Application.Current.MainWindow;
-
                 Todo.Insert(index, TodoAdd);
 
                 if (_global._currentDay.Date.Date == TodoAdd.DateDebut.Date)
@@ -196,7 +176,7 @@ namespace DotAgenda.Models
             if (Todo.IndexOf(Tache) != -1)
             {
                 Todo.Remove(Tache);
-                _db.Todo.DeleteTodoDB(Tache);
+                DataBaseTodo._dbTodo.DeleteTodoDB(Tache);
                 _prim.SetCurrentDate();
 
                 return true;

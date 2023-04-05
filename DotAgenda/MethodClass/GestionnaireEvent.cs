@@ -26,39 +26,43 @@ namespace DotAgenda.MethodClass
 
         public Annee[] A;
 
-        public DataBase _db;
-        public GlobalDict _dict;
-        public Primitives _prim;
-
         private GestionnaireEvent() { }
 
-        public Annee[] InitArray()
+        public void Init()
         {
+            A = new Annee[App.LastDate.Year - App.StartDate.Year + 1];
+
             NextEvent = new ObservableCollection<EventDay>();
+            ListeFichiers = new ObservableCollection<Fichier>();
+            ListeDossiersType = InitFolderType();
+            DataBaseFile._dbFile.SetListeFichiers();
 
-            A = new Annee[4];
             InitA();
-            _db.Event.InitEvent();
-            _db.Todo.InitTodo();
-            _db.Event.InitFileEvent();
 
-
-            return A;
+            DataBaseEvents._dbEvent.InitEvent();
+            DataBaseTodo._dbTodo.InitTodo();
+            DataBaseEvents._dbEvent.InitFileEvent();
         }
-
+        
 
         public void InitA()
         {
+            GlobalDict _dict = GlobalDict._dict;
 
             int TodayYear = DateTime.Now.Year - 1;
-            for (int k = 0; k < 4; ++k)
+
+            for (int k = 0; k < A.Count(); ++k)
             {
                 A[k] = new Annee();
-                A[k].Num = TodayYear + k;
-                A[k].Bisextile = false;
+                A[k].Num = App.StartDate.Year + k;
+
 
                 for (int i = 0; i < 12; ++i)
                 {
+                    if (i == 1 && A[k].Bisextile)
+                        _dict.DictMois["Fevrier"] = 29;
+                    else _dict.DictMois["Fevrier"] = 28;
+
                     //Init du mois
 
                     A[k].M[i] = new Mois(_dict.DictMois.ElementAt(i).Value);
@@ -83,14 +87,9 @@ namespace DotAgenda.MethodClass
             }
         }
 
-        public ObservableCollection<Fichier> InitListeFichiers()
-        {
-            return _db.File.SetListeFichiers();
-        }
-
         public ObservableCollection<Dossier> InitFolderType()
         {
-            return _prim.InitFolderType();
+            return Primitives._prim.InitFolderType();
         }
     }
 

@@ -63,9 +63,9 @@ namespace DotAgenda.View
 
             _global = GestionnaireEvent._global;
 
-            _dict = _global._dict;
-            _db = _global._db;
-            _prim = _global._prim;
+            _dict = GlobalDict._dict;
+            _db = DataBase._db;
+            _prim = Primitives._prim;
 
             this.DataContext = _global._currentDay;
             NextEvent.ItemsSource = _global.NextEvent;
@@ -108,7 +108,6 @@ namespace DotAgenda.View
             TimeSpan _currentTime = DateTime.Now.TimeOfDay;
             double offset = (_currentTime.TotalSeconds / (24 * 75 * 60)) * ScrollViewerSize;
 
-            Console.WriteLine("size : " + ScrollViewerSize);
             // Scroll to the calculated offset
             scrollviewer.ScrollToVerticalOffset(offset);
         }
@@ -510,7 +509,7 @@ namespace DotAgenda.View
 
             TodoItem Tache = _global.A[numY].M[_global._currentDay.Date.Month - 1].J[_global._currentDay.Date.Day - 1].Todo[index];
 
-            _db.Todo.ChangeEtatTacheDB(Tache);
+            DataBaseTodo._dbTodo.ChangeEtatTacheDB(Tache);
             _prim.ChangeEtatTache(Tache);
         }
 
@@ -560,10 +559,7 @@ namespace DotAgenda.View
 
             int pos = _global._currentDay.ListeEvent.IndexOf(item);
 
-            EventDay EventToRemove = _global._currentDay.ListeEvent[pos];
-
-            int numY = EventToRemove.DateDebut.Year - DateTime.Today.Year + 1;
-            _global.A[numY].M[EventToRemove.DateDebut.Month - 1].J[EventToRemove.DateDebut.Day - 1].DeleteEvent(EventToRemove);
+            _global._currentDay.ListeEvent[pos].RemoveEvent();
 
             InitDetailsEvent(_prim.SearchNextEvent(_mainView.delai_nextEvent, DateTime.Today));
 
@@ -670,8 +666,6 @@ namespace DotAgenda.View
         {
             Button btn = sender as Button;
             EventDay item = btn.DataContext as EventDay;
-
-            Console.WriteLine(item.Titre);
 
             int pos = _global._currentDay.ListeEvent.IndexOf(item);
 
