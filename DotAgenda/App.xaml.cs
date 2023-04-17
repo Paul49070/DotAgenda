@@ -3,6 +3,7 @@ using DotAgenda.MethodClass.DataBaseMethods;
 using DotAgenda.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
@@ -59,6 +60,9 @@ namespace DotAgenda
         {
             InitGlobals();
 
+            DataBase._db.UpdateConnectionDB();
+            Primitives._prim.StartNotificationApp();
+
             var mainWindow = new MainWindow();
             //Re-enable normal shutdown mode.
             Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
@@ -71,10 +75,9 @@ namespace DotAgenda
             using (SQLiteConnection connection = new SQLiteConnection(SystemDB_Path))
             {
                 connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand("select ID From User where EstConnecte = 1 and SupportDeConnection = @support", connection))
+                using (SQLiteCommand command = new SQLiteCommand("select UserID From UserConnection where Machine = @machine and userID != -1", connection))
                 {
-                    command.Parameters.AddWithValue("support", Environment.MachineName);
-
+                    command.Parameters.AddWithValue("machine", Environment.MachineName);
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         if (reader.Read())
@@ -109,6 +112,7 @@ namespace DotAgenda
                 Current.Resources["Font"] = Current.Resources["Font_B"];
                 Current.Resources["Font_Search"] = Current.Resources["Font_B"];
                 Current.Resources["PopupBG"] = Current.Resources["PopupBG_B"];
+                Current.Resources["FieldColor"] = Current.Resources["FieldColor_B"];
             }
 
             else
@@ -119,7 +123,16 @@ namespace DotAgenda
                 Current.Resources["Font"] = Current.Resources["Font_W"];
                 Current.Resources["Font_Search"] = Current.Resources["Font_Grey"];
                 Current.Resources["PopupBG"] = Current.Resources["PopupBG_W"];
+                Current.Resources["FieldColor"] = Current.Resources["FieldColor_W"];
             }
         }
+        /*
+        protected void OnClosing(CancelEventArgs e)
+        {
+            if (!User.RememberMe)
+                DataBase._db.Deconnect();
+
+            Primitives._prim.KillNotificationApp();
+        }*/
     }
 }

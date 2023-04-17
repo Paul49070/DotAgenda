@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SQLite;
 using System.IO;
-
+using System.Windows;
 
 namespace DotAgenda.MethodClass.DataBaseMethods
 {
@@ -48,7 +48,6 @@ namespace DotAgenda.MethodClass.DataBaseMethods
                     command.Parameters.AddWithValue("nom", fic.Nom);
                     command.Parameters.AddWithValue("date",fic.DateAjout.ToString("s"));
                     command.ExecuteNonQuery();
-
                     return true;
                 }
             }
@@ -100,15 +99,10 @@ namespace DotAgenda.MethodClass.DataBaseMethods
                     {
                         if (reader.Read())
                         {
-                            if (DateTime.TryParse(reader.GetString(0), out DateTime start) && DateTime.TryParse(reader.GetString(1), out DateTime end))
+                            foreach (Fichier fic in GestionnaireEvent._global.ListeFichiers)
                             {
-
-                                int year = start.Year - DateTime.Today.Year + 1;
-                                foreach (Fichier fic in GestionnaireEvent._global.ListeFichiers)
-                                {
-                                    if (fic.ID == id)
-                                        return fic;
-                                }
+                                if (fic.ID == id)
+                                     return fic;
                             }
                         }
                     }
@@ -141,7 +135,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
 
                             if(DateTime.TryParse(reader.GetString(3).ToString(), out DateAjout))
                             {
-                                Fichier fic = new Fichier(ID, Nom, DateAjout);
+                                new Fichier(Nom, ID, DateAjout);
                             }
 
                         }

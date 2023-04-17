@@ -1,4 +1,5 @@
 ﻿using DotAgenda.MethodClass;
+using DotAgenda.MethodClass.DataBaseMethods;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,12 +60,21 @@ namespace DotAgenda.Models
         }
 
 
-        public Fichier(string ID, string Nom, DateTime DateAjout = default(DateTime))
+        public Fichier(string Nom, string ID = "null", DateTime DateAjout = default)
         {
+            
             _global = GestionnaireEvent._global;
 
-            this.ID = ID;
             this.Nom = Nom;
+
+            if (ID == "null")
+                this.ID = Primitives._prim.GenerateID();
+            else this.ID = ID;
+
+            if (DateAjout == default)
+                this.DateAjout = DateTime.Today;
+            else this.DateAjout = DateAjout;
+
 
             try
             {
@@ -77,16 +87,24 @@ namespace DotAgenda.Models
                 Type = GlobalDict._dict.ExtensionDict["null"];
             }
 
-            if(DateAjout != default(DateTime))
-                this.DateAjout = DateTime.Today;
 
             AttachedEvent = new List<EventDay>();
 
+
+            AddFileToDict();
             AddToFileList();
             AddToFolderType();
         }
 
-        public void AddToFileList()
+        private void AddFileToDict()
+        {
+            //Cette vérif est normalement inutile mais on sait jamais
+
+            if (GlobalDict._dict.DictFile.Keys.ToList().IndexOf(this.Nom) == -1)
+                GlobalDict._dict.DictFile.Add(this.Nom, this);
+        }
+
+        private void AddToFileList()
         {
             if(_global.ListeFichiers.IndexOf(this)==-1)
             {
@@ -94,7 +112,7 @@ namespace DotAgenda.Models
             }
         }
 
-        public void AddToFolderType()
+        private void AddToFolderType()
         {            
             foreach (Dossier folder in _global.ListeDossiersType)
             {

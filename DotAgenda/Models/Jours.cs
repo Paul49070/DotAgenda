@@ -64,9 +64,9 @@ namespace DotAgenda.Models
             var _mainView = (MainWindow)Application.Current.MainWindow;
 
             EventAdd.Fini = _prim.Event_Fini(EventAdd.DateDebut);
-
+            EventAdd.AjouterAlerte(new Alerte(EventAdd, 30, Alerte.TypeMoyenEnvoie.Both, Alerte.DelaiType.Minute));
             bool HasBeenAdded = DataBaseEvents._dbEvent.AddEventToDB(EventAdd);
-
+            
             if (HasBeenAdded)
             {
                 if (AddEventToList(EventAdd))

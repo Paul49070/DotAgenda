@@ -656,7 +656,6 @@ namespace DotAgenda.View
                 {
                     _prim.AddFileToEvent(fic, _global.A[year].M[date_actuelle.Month - 1].J[date_actuelle.Day - 1].ListeEvent[pos]);
                 }
-
             }
 
             btn.Style = (Style)Application.Current.FindResource("BasiqueBtnList");
@@ -669,12 +668,22 @@ namespace DotAgenda.View
 
             int pos = _global._currentDay.ListeEvent.IndexOf(item);
 
-
             var event_window = new MoreEventPage(_global._currentDay.ListeEvent[pos]);
+            event_window.Closed += MoreEventClosed;
             event_window.Owner = Window.GetWindow(this);
+            ChangeAllowDrop(false);
             event_window.ShowDialog();
         }
 
+        private void MoreEventClosed(object sender, EventArgs e)
+        {
+            ChangeAllowDrop();
+        }
+
+        private void ChangeAllowDrop(bool allow = true)
+        {
+            this.AllowDrop = allow;
+        }
 
         private void DragOnEvent(object sender, DragEventArgs e)
         {

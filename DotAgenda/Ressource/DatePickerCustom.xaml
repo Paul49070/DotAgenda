@@ -15,20 +15,26 @@
         <Setter Property="IsEnabled" Value="True"></Setter>
         <Setter Property="IsReadOnly" Value="False"></Setter>
     </Style>
-    
-    
+
+
 
     <Style x:Key="styleDatePicker" TargetType="{x:Type DatePicker}">
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Foreground" Value="{DynamicResource Font}"/>
         <Setter Property="FontSize" Value="16"/>
-        <Setter Property="SelectedDateFormat" Value="Long"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="SelectedDateFormat" Value="Short"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CalendarStyle" Value="{DynamicResource CalendarStylePopUp}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type DatePicker}">
-                    <Button Style="{DynamicResource BasiqueBtnList}" Height="auto" x:Name="PART_Button" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Stretch" Cursor="Hand" VerticalAlignment="Stretch">
-                        
-                        <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Transparent" BorderBrush="{DynamicResource Tertiary}" BorderThickness="0,0,0,2">
+                    <Grid>
+                        <Button Style="{DynamicResource BasiqueBtnList}" Cursor="{TemplateBinding Cursor}" Height="auto" x:Name="PART_Button" Margin="0" Padding="0" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+                        <Border Style="{DynamicResource BorderForFields}" Padding="10,3">
                             <Grid x:Name="PART_Root" Background="Transparent">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto" />
@@ -38,7 +44,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <DatePickerTextBox Grid.Column="1" x:Name="PART_TextBox" Background="Transparent"
-                                       BorderBrush="Transparent"
+                                       BorderBrush="Transparent" 
                                        BorderThickness="0"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Stretch"
@@ -53,13 +59,14 @@
                                        Foreground="{TemplateBinding Foreground}"
                                        Style="{DynamicResource MaterialDesignTextBoxBase}">
                                 </DatePickerTextBox>
-                                <Button Grid.Column="0" BorderThickness="0" Margin="5,0,0,0">
+                                <Button Grid.Column="0" BorderThickness="0" Name="BtnCalendar" Margin="0" Cursor="{TemplateBinding Cursor}">
                                     <Button.Style>
                                         <Style TargetType="{x:Type Button}">
+                                            <Setter Property="Foreground" Value="{DynamicResource Font}"/>
                                             <Setter Property="Template">
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="{x:Type Button}">
-                                                        <Button x:Name="PART_Button" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Center">
+                                                        <Button x:Name="PART_Button" Cursor="{TemplateBinding Cursor}" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Center">
                                                             <Button.Style>
                                                                 <Style TargetType="{x:Type Button}">
                                                                     <Setter Property="OverridesDefaultStyle" Value="True"></Setter>
@@ -67,8 +74,8 @@
                                                                         <Setter.Value>
                                                                             <ControlTemplate TargetType="{x:Type Button}">
 
-                                                                                <wpf:PackIcon Kind="CalendarMultiselectOutline" Foreground="{DynamicResource Font}" Cursor="Hand" Background="Transparent" 
-                                                                                          FontSize="12" Height="18" Width="18" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                                                <wpf:PackIcon Kind="CalendarMultiselectOutline" Foreground="{TemplateBinding Foreground}" Cursor="Hand" Background="Transparent" 
+                                                                                          FontSize="12" Height="18" Width="18" Padding="20,20,20,20" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                                                                             </ControlTemplate>
                                                                         </Setter.Value>
@@ -83,18 +90,29 @@
                                         </Style>
                                     </Button.Style>
                                 </Button>
-             
+
                                 <Path x:Name="arrow"  Grid.Column="2" Data="F1 M 0,0 L 2.667,2.66665 L 5.3334,0 L 5.3334,-1.78168 L 2.6667,0.88501 L0,-1.78168 L0,0 Z" Fill="{DynamicResource Font}" HorizontalAlignment="Center" Margin="0,0,6,0" VerticalAlignment="Center"/>
 
 
-                                <Popup x:Name="PART_Popup" StaysOpen="False" PopupAnimation="Fade" Placement="Bottom" HorizontalOffset="-6"  AllowsTransparency="True" />
                             </Grid>
                         </Border>
                     </Button>
+                    <Popup x:Name="PART_Popup" StaysOpen="False" PopupAnimation="Fade" Placement="Bottom" HorizontalOffset="-6"  AllowsTransparency="True" />
+
+                    </Grid>
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="arrow" Property="Fill" Value="{DynamicResource Contrast}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Cursor" Value="ArrowCD"/>
+                            <Setter Property="Cursor" TargetName="BtnCalendar" Value="ArrowCD"/>
+                            <Setter Property="Foreground" Value="{DynamicResource Font_Grey}"/>
+                            <Setter TargetName="arrow" Property="Fill" Value="{DynamicResource Font_Grey}"/>
+
+                            <Setter Property="Foreground" TargetName="BtnCalendar" Value="{DynamicResource Font_Grey}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

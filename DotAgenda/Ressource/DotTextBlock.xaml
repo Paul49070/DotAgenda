@@ -29,6 +29,7 @@
     <Style TargetType="CheckBox" x:Key="CheckBoxDot">
         <Setter Property="Cursor" Value="Hand"></Setter>
         <Setter Property="Foreground" Value="{DynamicResource Font}"/>
+        <Setter Property="AllowDrop" Value="False"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type CheckBox}">
@@ -62,6 +63,7 @@
 
     <Style TargetType="CheckBox" x:Key="CheckBoxDropDown">
         <Setter Property="Cursor" Value="Hand"></Setter>
+        <Setter Property="AllowDrop" Value="False"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
         <Setter Property="Foreground" Value="{DynamicResource Font_Grey}"></Setter>
         <Setter Property="Template">
@@ -74,14 +76,14 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <wpf:PackIcon Kind="chevronup" Name="icon" VerticalAlignment="Center" Foreground="{TemplateBinding Foreground}" Width="18" Height="18"/>
-                            <TextBlock Text="{TemplateBinding Content}" Grid.Column="1" Foreground="{TemplateBinding Foreground}" Style="{DynamicResource numTXTjour}"/>
+                            <wpf:PackIcon Kind="chevronleft" Name="icon" Grid.Column="1" VerticalAlignment="Center" Foreground="{TemplateBinding Foreground}" Width="18" Height="18"/>
+                            <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" Style="{DynamicResource numTXTjour}"/>
 
                         </Grid>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="False">
-                            <Setter TargetName="icon" Property="Kind" Value="chevrondown"/>
+                            <Setter TargetName="icon" Property="Kind" Value="chevronright"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -89,4 +91,14 @@
         </Setter>
     </Style>
 
+    <Style TargetType="TextBlock" x:Key="CasualTextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource PoppinsFontFamily}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Font}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="TextWrapping" Value="NoWrap"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+    </Style>
+    
 </ResourceDictionary>

@@ -22,6 +22,47 @@ namespace DotAgenda.MethodClass.DataBaseMethods
         {
         }
 
+        public void UpdateConnectionDB()
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                bool RowAlreadyExists;
+
+                using (SQLiteCommand commandCheck = new SQLiteCommand("SELECT * FROM UserConnection WHERE Machine=@machine", connection))
+                {
+                    commandCheck.Parameters.AddWithValue("machine", Environment.MachineName);
+
+
+                    using (SQLiteDataReader reader = commandCheck.ExecuteReader())
+                        if (reader.Read())
+                            RowAlreadyExists = true;
+                        else RowAlreadyExists = false;
+                }
+
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.Parameters.AddWithValue("userID", App.ID);
+                    command.Parameters.AddWithValue("machine", Environment.MachineName);
+                    command.Parameters.AddWithValue("date", DateTime.Now.ToString("s"));
+
+                    if (RowAlreadyExists)
+                        command.CommandText = "UPDATE UserConnection SET UserID = @userID, LastModification=@date WHERE Machine=@machine";
+
+                    else command.CommandText = "INSERT INTO UserConnection (UserID, Machine, LastModification) VALUES (@userID, @machine, @date)";
+
+                    command.ExecuteNonQuery();
+                }
+                
+
+                using (SQLiteCommand command_Delete = new SQLiteCommand("DELETE FROM UserConnection WHERE LastModification < @limitDate", connection))
+                {
+                    command_Delete.Parameters.AddWithValue("limitDate", DateTime.Now.AddDays(-30));
+                    command_Delete.ExecuteNonQuery();
+                }
+            }
+        }
+
         public void InitProfil()
         {
             bool bmail = true, notif = true, light = true;
@@ -81,9 +122,11 @@ namespace DotAgenda.MethodClass.DataBaseMethods
             using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
             {
                 connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand("UPDATE User SET EstConnecte = 0 where (id=@id)", connection))
+                using (SQLiteCommand command = new SQLiteCommand("UPDATE UserConnection SET UserID = -1, LastModification=@date WHERE Machine=@machine",connection))
                 {
-                    command.Parameters.AddWithValue("id", App.ID);
+                    command.Parameters.AddWithValue("machine", Environment.MachineName);
+                    command.Parameters.AddWithValue("date", DateTime.Now.ToString("s"));
+
                     command.ExecuteNonQuery();
                 }
             }
@@ -110,39 +153,62 @@ namespace DotAgenda.MethodClass.DataBaseMethods
             }
         }
 
-        public void AddUser(SQLiteConnection connection, string mail, string mdp, int ResterConnecter)
+        public bool CheckDoubleUser(SQLiteConnection connection, string mail)
         {
-            using (SQLiteCommand command_Add = new SQLiteCommand("INSERT INTO User (Password, Mail, EstConnecte, SupportdeConnection) VALUES (@mdp, @user, @connecter, @appareil)", connection))
+            bool NotalreadyExist;
+
+            using (SQLiteCommand commandCheckAlreadyExists = new SQLiteCommand("SELECT * FROM User WHERE Mail = @mail", connection))
+            {
+                commandCheckAlreadyExists.Parameters.AddWithValue("mail", mail);
+
+                using (SQLiteDataReader reader = commandCheckAlreadyExists.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        NotalreadyExist = false; //check if there is already somebody with the mail
+                    }
+
+
+                    else NotalreadyExist = true;
+                }
+            }
+
+            return NotalreadyExist;
+        }
+
+        public void AddUser(SQLiteConnection connection, string mail, string mdp, int ResterConnecter)
+        { 
+            using (SQLiteCommand command_Add = new SQLiteCommand("INSERT INTO User (Password, Mail, EstConnecte) VALUES (@mdp, @user, @connecter)", connection))
             {
                 command_Add.Parameters.AddWithValue("user", mail);
-                command_Add.Parameters.AddWithValue("mdp", mdp);
+                command_Add.Parameters.AddWithValue("mdp", Primitives._prim.CryptPassword(mdp));
                 command_Add.Parameters.AddWithValue("connecter", ResterConnecter);
-                command_Add.Parameters.AddWithValue("appareil", Environment.MachineName);
 
                 command_Add.ExecuteNonQuery();
             }
         }
 
-        public int GetUserID(SQLiteConnection connection, string mail, string mdp)
+        public int GetUserID(SQLiteConnection connection, string mail)
         {
-            using (SQLiteCommand command_Select = new SQLiteCommand("SELECT ID FROM User where Mail = @user AND Password = @mdp", connection))
+            int ID = -1;
+
+            using (SQLiteCommand command_Select = new SQLiteCommand("SELECT ID FROM User where Mail = @user", connection))
             {
                 command_Select.Parameters.AddWithValue("user", mail);
-                command_Select.Parameters.AddWithValue("mdp", mdp);
 
                 using (SQLiteDataReader reader = command_Select.ExecuteReader())
                 {
                     if (reader.Read())
-                        return reader.GetInt32(0);
+                        ID = reader.GetInt32(0);
                 }
             }
 
-            return -1;
+            return ID;
         }
 
         public void AddUserDetails(SQLiteConnection connection, string prenom, string nom, string mail)
         {
-            using (SQLiteCommand command_Add_UserDetails = new SQLiteCommand("INSERT INTO UserDetails (UserID, MailAllow, NotificationAllow, LightTheme, Prenom, Nom, Mail) VALUES (@id, 0, 0, 0, @prenom, @nom, @mail)", connection))
+            using (SQLiteCommand command_UserDetails = new SQLiteCommand("INSERT INTO UserDetails (UserID, MailAllow, NotificationAllow, LightTheme, Prenom, Nom, Mail) VALUES (@id, 0, 0, 0, @prenom, @nom, @mail)", connection))
             {
                 string FirstLetterToUpper(string str)
                 {
@@ -153,12 +219,12 @@ namespace DotAgenda.MethodClass.DataBaseMethods
                     return new_str;
                 }
 
-                command_Add_UserDetails.Parameters.AddWithValue("id", App.ID);
-                command_Add_UserDetails.Parameters.AddWithValue("prenom", FirstLetterToUpper(prenom));
-                command_Add_UserDetails.Parameters.AddWithValue("nom", FirstLetterToUpper(nom));
-                command_Add_UserDetails.Parameters.AddWithValue("mail", mail);
+                command_UserDetails.Parameters.AddWithValue("id", App.ID);
+                command_UserDetails.Parameters.AddWithValue("prenom", FirstLetterToUpper(prenom));
+                command_UserDetails.Parameters.AddWithValue("nom", FirstLetterToUpper(nom));
+                command_UserDetails.Parameters.AddWithValue("mail", mail);
 
-                command_Add_UserDetails.ExecuteNonQuery();
+                command_UserDetails.ExecuteNonQuery();
             }
         }
 

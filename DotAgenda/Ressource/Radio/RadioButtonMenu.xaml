@@ -45,7 +45,7 @@
         </Style.Triggers>
     </Style>-->
 
-    <Style BasedOn="{StaticResource {x:Type ToggleButton}}"
+    <Style
            TargetType="{x:Type RadioButton}"
            x:Key="BoutonsMenu">
         <Style.Setters>

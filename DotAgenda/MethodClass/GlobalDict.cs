@@ -18,8 +18,12 @@ namespace DotAgenda.MethodClass
         public Dictionary<string, int> DictMois;
         public Dictionary<string, string[]> DossierTypeIconDict;
         public Dictionary<string, string> ExtensionDict;
+
         public Dictionary<string, ClasseEvent_item> DictClasse;
         public Dictionary<string, GroupEvent> DictGroupEvent;
+        public Dictionary<string, Fichier> DictFile;
+        public Dictionary<string, string> SmtpList;
+
 
         private string Audio = "Audio";
         private string Video = "Video";
@@ -44,9 +48,39 @@ namespace DotAgenda.MethodClass
         {
             DictClasse = new Dictionary<string, ClasseEvent_item>();
             DictGroupEvent = new Dictionary<string, GroupEvent>();
+            DictFile = new Dictionary<string, Fichier>();
+
             DictMois =InitTailleMois();
             DossierTypeIconDict = InitTypeIcon();
             ExtensionDict = InitExtension();
+        }
+
+        public void InitSmtpList()
+        {
+            SmtpList = new Dictionary<string, string>
+            {
+                { "neuf", "smtp.neuf.fr" },
+                { "aliceadsl", "smtp.aliceadsl.fr" },
+                { "aol", "smtp.aol.com" },
+                { "att", "outbound.att.net" },
+                { "bluewin", "smtpauths.bluewin.ch" },
+                { "bouygtel", "smtp.bouygtel.fr" },
+                { "club-internet", "mail.club-internet.fr" },
+                { "free", "smtp.free.fr" },
+                { "gmail", "smtp.gmail.com" },
+                { "ifrance", "smtp.ifrance.fr" },
+                { "hotmail", "smtp.live.com" },
+                { "laposte", "smtp.laposte.fr" },
+                { "netcourrier", "smtp.netcourrier.com" },
+                { "o2", "smtp.o2.com" },
+                { "outlook", "smtp.live.com" },
+                { "sympatico", "smtphm.sympatico.ca" },
+                { "tiscali", "smtp.tiscali.fr" },
+                { "verizon", "outgoing.verizon.net" },
+                { "voila", "smtp.voila.fr" },
+                { "wanadoo", "smtp.wanadoo.fr" },
+                { "yahoo", "mail.yahoo.com" }
+            };
         }
 
         public Dictionary<string, int> InitTailleMois()

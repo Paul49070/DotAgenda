@@ -11,17 +11,17 @@
         Background="Transparent"
         AllowsTransparency="True"
         ShowInTaskbar="False"
+        xmlns:viewModel="clr-namespace:DotAgenda.ViewModels"
         xmlns:fileConverter="clr-namespace:DotAgenda.View.Converter"
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
-        
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
         WindowStartupLocation="CenterOwner"
-        SizeToContent="Height" 
-        Width="650" 
+        SizeToContent="Height"
+        Width="800"
         Title="MoreEventPage">
+    
     <Window.Resources>
         <Style TargetType="{x:Type Button}">
-            <Setter Property="Width" Value="90" />
-            <Setter Property="Height" Value="30" />
             <Setter Property="FontFamily" Value="/Font/#Poppins"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -39,6 +39,8 @@
         <fileConverter:FileToShortName x:Key="ConverterFileToShortName"/>
 
     </Window.Resources>
+    
+    
     <Border CornerRadius="20" BorderBrush="{DynamicResource Tertiary}" BorderThickness="0">
         <Border Background="{DynamicResource bg}" Margin="-1" CornerRadius="20">
 
@@ -50,14 +52,13 @@
 
                 
 
-                <Grid Margin="15,10,10,10" Grid.Column="1">
+                <Grid Margin="0,10,0,10" Grid.Column="1">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
@@ -65,467 +66,36 @@
 
 
 
-
-
-                    <Grid Grid.Column="1">
-
-                        <Border x:Name="BorderEvent" Margin="10,20,10,0" Grid.Column="1"
-                                Background="Transparent"  AllowDrop="True"
-                                Drop="DropFile"
-                                CornerRadius="10" BorderThickness="0" 
-                                Style="{DynamicResource BorderDropped}">
-
-                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-
-
-                                <!--pas de fichiers-->
-                                <Button Style="{DynamicResource BasiqueBtnListHover}" Name="NoFile" MaxHeight="320" Height="270"
-                                        Click="GetFile">
-                                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition/>
-                                        </Grid.RowDefinitions>
-                                        <wpf:PackIcon Kind="folderplusoutline" Foreground="{DynamicResource Font}"
-                                              HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                                              Width="50" Height="50"/>
-
-                                        <StackPanel Grid.Row="1" VerticalAlignment="Top" Margin="0,10,0,0">
-
-                                            <TextBlock Text="Ajoutez un fichier" HorizontalAlignment="Center"
-                                           VerticalAlignment="Top" Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font}"/>
-
-                                            <TextBlock Text=" ou glissez-déposer" HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" Margin="-4,0,0,4" Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font_Grey}"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </Button>
-
-                                <!--au moins 1 fichier-->
-                                <Grid x:Name="HasFile" Margin="0,5,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="auto"/>
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Text="Fichiers attachés" Margin="20,0,0,0" HorizontalAlignment="Left" FontSize="13"
-                                           VerticalAlignment="Center" Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font}"/>
-
-                                        <Button Content="Plus" Grid.Column="1" Margin="0,0,20,2" Click="GetFile"
-                                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Style="{DynamicResource BtnIcon}" 
-                                        FontSize="12" Height="30"/>
-                                    </Grid>
-
-
-                                    <ScrollViewer Grid.Row="1"  Margin="0,10,10,10" x:Name="scrollviewer" MaxHeight="310"
-                                               PreviewMouseWheel="DataGrid_PreviewMouseWheel" VerticalAlignment="Top"
-                                               ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                                               ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-
-
-                                        <ListView   
-                                                ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                                ScrollViewer.CanContentScroll="False"
-                                                Padding="0,0,0,20"
-                                                Name="ListeView_File" 
-                                                VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                                                HorizontalContentAlignment="Stretch" ItemContainerStyle="{StaticResource containerStyle1}">
-
-
-                                            <ListView.ItemTemplate>
-                                                <DataTemplate>
-
-
-                                                    <Button x:Name="Item" Click="OpenFile" 
-                                                        Style="{DynamicResource BasiqueBtnList}"
-                                                        Background="Transparent" MaxWidth="260"
-                                                        VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
-                                                        Height="auto">
-                                                        <Border HorizontalAlignment="stretch" VerticalAlignment="Stretch" 
-                                                            Background="{DynamicResource PopupBG}" CornerRadius="10">
-
-                                                            <Grid HorizontalAlignment="stretch" Margin="5">
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="auto"/>
-                                                                    <ColumnDefinition Width="*"/>
-                                                                    <ColumnDefinition Width="auto"/>
-                                                                </Grid.ColumnDefinitions>
-
-                                                                <Button x:Name="CloseBTN" Grid.Column="0" Visibility="Hidden" Width="0"
-                                                                    Style="{DynamicResource BtnIcon}" Content="close" MaxHeight="18" MaxWidth="18"
-                                                                    Foreground="{DynamicResource Font}" Margin="0" Click="DetachFile"/>
-
-
-                                                                <TextBlock Padding="10" Focusable="False"
-                                                                       FontFamily="/Font/#Poppins"
-                                                                       TextWrapping = "NoWrap"
-                                                                       Text="{Binding Path=Nom, Converter={StaticResource ConverterFileToShortName}}"
-                                                                       Background="Transparent"
-                                                                       Foreground="{DynamicResource Font}"
-                                                                       HorizontalAlignment="Left"
-                                                                       VerticalAlignment="Center"
-                                                                       TextAlignment="left"
-                                                                           TextTrimming="WordEllipsis"
-                                                                       FontSize="11" Grid.Column="1"/>
-
-
-                                                                <wpf:PackIcon Grid.Column="2" Kind="{Binding Path=Nom, Converter={StaticResource ConverterFileToIcon}}" Width="18" Height="18" 
-                                                                          HorizontalAlignment="right" Margin="0,0,10,0" x:Name="Icon"
-                                                                          Foreground="{Binding Path=Nom, Converter={StaticResource ConverterFileToColor}}" VerticalAlignment="Center" />
-
-
-                                                            </Grid>
-                                                        </Border>
-                                                    </Button>
-                                                    <DataTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="true">
-                                                            <Setter Property="Visibility" TargetName="CloseBTN" Value="Visible"/>
-                                                            <Setter Property="Width" TargetName="CloseBTN" Value="auto"/>
-                                                            <Setter Property="Margin" TargetName="CloseBTN" Value="5,0,0,0"/>
-                                                        </Trigger>
-                                                    </DataTemplate.Triggers>
-                                                </DataTemplate>
-                                            </ListView.ItemTemplate>
-                                        </ListView>
-                                    </ScrollViewer>
-                                </Grid>
-                            </Grid>
-                        </Border>
-
-                    </Grid>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Background="LightGreen" Name="SideBorder" Width="5" Height="auto" CornerRadius="2"
-                        Margin="-15,80,0,80" HorizontalAlignment="Left"/>
-
-                        <Grid Margin="20,0,30,0" Grid.Column="1">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-
-                                <TextBox x:Name="TitreEvent" Margin="0,25,0,0"
-                         Background="Transparent" TextWrapping = "NoWrap"
-                         BorderThickness="0,0,0,2" Padding="5,0,5,0" FontSize="15" Foreground="{DynamicResource Font}"
-                         HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins">
-                                    <TextBox.Style>
-                                        <Style TargetType="TextBox">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="{x:Type TextBox}">
-                                                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsEnabled" Value="false">
-                                                                <Setter Property="Opacity" TargetName="border" Value="1"/>
-                                                            </Trigger>
-                                                            <Trigger Property="IsMouseOver" Value="true">
-                                                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                            </Trigger>
-
-                                                            <Trigger Property="IsMouseOver" Value="False">
-                                                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                            </Trigger>
-
-                                                            <Trigger Property="IsFocused" Value="true">
-                                                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </TextBox.Style>
-                                </TextBox>
-
-
-
-
-                            <DatePicker Style="{DynamicResource styleDatePicker}" 
-                                    x:Name="DatePickerEvent" Margin="0,25,0,0"
-                                    CalendarStyle="{DynamicResource CalendarStylePopUp}" 
-                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                                    Background="Transparent" BorderThickness="0" Grid.Row="1">
-                            </DatePicker>
-
-
-                            <Grid HorizontalAlignment="Stretch" Grid.Row="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition Width="auto"/>
-                                </Grid.ColumnDefinitions>
-                                <ComboBox Template="{DynamicResource ComboBoxTemplate1}" Foreground="{DynamicResource Font}" 
-                      Name="Heure" VerticalContentAlignment="Center" Cursor="Hand"
-                      HorizontalAlignment="Left" VerticalAlignment="Top" 
-                      Width="80" Height="35" Margin="0,25,20,0" 
-                      FontSize="14" FontFamily="/Font/#Poppins" BorderThickness="0">
-                                    <ComboBox.Style>
-                                        <Style TargetType="ComboBox">
-                                            <Setter Property="ItemContainerStyle" Value="{StaticResource ItemStyle}"/>
-                                            <Setter Property="Padding" Value="5,0,0,5"/>
-                                            <Setter Property="Foreground" Value="{DynamicResource Font}"/>
-                                        </Style>
-                                    </ComboBox.Style>
-                                </ComboBox>
-
-                                <ComboBox Template="{DynamicResource ComboBoxTemplate1}" Foreground="{DynamicResource Font}"  
-                      Name="HeureFin" Grid.Column="1" HorizontalAlignment="Right"
-                      FontSize="14" FontFamily="/Font/#Poppins" Cursor="Hand"
-                      Background="White" VerticalAlignment="Top" VerticalContentAlignment="Center"
-                      Width="80" Margin="0,25,0,0" Height="35"
-                     BorderThickness="0" Grid.ColumnSpan="2">
-                                    <ComboBox.Style>
-                                        <Style TargetType="ComboBox">
-                                            <Setter Property="ItemContainerStyle" Value="{StaticResource ItemStyle}" ></Setter>
-                                            <Setter Property="Padding" Value="5,0,0,5"/>
-                                            <Setter Property="Foreground" Value="{DynamicResource Font}"/>
-                                        </Style>
-                                    </ComboBox.Style>
-                                </ComboBox>
-                            </Grid>
-
-
-                            <StackPanel Grid.Row="3" Margin="0,20,0,0" VerticalAlignment="Stretch">
-                                <Grid HorizontalAlignment="Stretch">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Label Content="Description : " Foreground="{DynamicResource Font}" FontSize="13"
-                           FontFamily="/Font/#Poppins" HorizontalAlignment="Left" Margin="0,0,0,5"/>
-
-                                </Grid>
-                                <Border BorderThickness="2" Height="auto" BorderBrush="{DynamicResource Tertiary}" CornerRadius="8">
-                                    <ScrollViewer MaxHeight="50" MinHeight="50" Margin="0,5" PreviewMouseWheel="DataGrid_PreviewMouseWheel"
-                                   ScrollViewer.VerticalScrollBarVisibility="Auto" x:Name="scrollviewerbis">
-
-                                        <TextBox x:Name="DescriptionTXT" Margin="5,5,5,5"
-                                 Background="Transparent" TextWrapping = "Wrap"
-                                 BorderThickness="0" Padding="5,0,5,0" FontSize="13" Foreground="{DynamicResource Font}"
-                                 HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins">
-                                            <TextBox.Style>
-                                                <Style TargetType="TextBox">
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="{x:Type TextBox}">
-                                                                <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                                    <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
-                                                                </Border>
-                                                                <ControlTemplate.Triggers>
-                                                                    <Trigger Property="IsEnabled" Value="false">
-                                                                        <Setter Property="Opacity" TargetName="border" Value="1"/>
-                                                                    </Trigger>
-                                                                    <Trigger Property="IsMouseOver" Value="true">
-                                                                        <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                                    </Trigger>
-
-                                                                    <Trigger Property="IsMouseOver" Value="False">
-                                                                        <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                                    </Trigger>
-
-                                                                    <Trigger Property="IsFocused" Value="true">
-                                                                        <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                                    </Trigger>
-                                                                </ControlTemplate.Triggers>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style>
-                                            </TextBox.Style>
-                                        </TextBox>
-                                    </ScrollViewer>
-                                </Border>
-                            </StackPanel>
-
-                            <ComboBox  VerticalAlignment="Bottom" Grid.Row="4"
-                              HorizontalAlignment="Left"
-                        Style="{DynamicResource ComboBoxStyle}" 
-                        Template="{DynamicResource ComBoxTemplateBIS}"
-                        ItemContainerStyle="{DynamicResource ItemStyle}"
-                        SelectionChanged="ClasseSelection_SelectionChanged"
-                        Name="ClasseSelection"
-                        Margin="-10,15,0,10">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Margin="10,3,10,0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="auto"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <Border CornerRadius="40" Background="{Binding Couleur}" Padding="2.5" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,2,5.5"/>
-                                            <TextBlock Text="{Binding Titre}" Margin="3,0,10,0" Grid.Column="1">
-                                            </TextBlock>
-                                        </Grid>
-
-                                    </DataTemplate>
-
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-
-
-                        </Grid>
-                    </Grid>
+                    <ContentControl x:Name="ContentControl" Margin="0,30,30,10" Grid.ColumnSpan="2" Content="{Binding CurrentView}"/>
 
                     <Border Grid.Row="1" Grid.ColumnSpan="2" BorderThickness="2" Height="2" HorizontalAlignment="Stretch"
-                                BorderBrush="{DynamicResource Tertiary}" Margin="15,5,10,15"/>
+                                BorderBrush="{DynamicResource Tertiary}" Margin="15,5,15,15"/>
 
-
-                        <Grid Name="ReccurencesEtAlertes" Grid.Row="2" Margin="25,0,0,10" Grid.ColumnSpan="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-
-                        <Grid HorizontalAlignment="Stretch" Margin="0,0,45,0">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-
-
-                            <CheckBox x:Name="ReccurenceCheck" Style="{DynamicResource RoundCheckBox}" Tag="clockoutline" Click="AddRemoveReccurence"  Content="Réccurence"/>
-
-
-
-
-                            <Grid Grid.Row="1" Name="ReccurenceGrid"  Margin="0,10,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="Tous(tes) les : " HorizontalAlignment="Left" FontSize="13"
-                                           VerticalAlignment="Center" Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font}"/>
-
-                                <TextBox x:Name="Frequency" Margin="10,0" Grid.Column="1" MaxLength="2" MinWidth="45" TextAlignment="Center"
-                                     Background="Transparent" TextWrapping = "NoWrap" VerticalAlignment="Center"
-                                     BorderThickness="0,0,0,2" Padding="5" FontSize="14" Foreground="{DynamicResource Font}"
-                                     HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins">
-                                    <TextBox.Style>
-                                        <Style TargetType="TextBox">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="{x:Type TextBox}">
-                                                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" Padding="5" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsEnabled" Value="false">
-                                                                <Setter Property="Opacity" TargetName="border" Value="1"/>
-                                                            </Trigger>
-                                                            <Trigger Property="IsMouseOver" Value="true">
-                                                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                            </Trigger>
-
-                                                            <Trigger Property="IsMouseOver" Value="False">
-                                                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                            </Trigger>
-
-                                                            <Trigger Property="IsFocused" Value="true">
-                                                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Tertiary}"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </TextBox.Style>
-                                </TextBox>
-
-                                <ComboBox  VerticalAlignment="Bottom" Grid.Column="2"
-                                    Style="{DynamicResource ComboBoxStyle}" 
-                                    Template="{DynamicResource ComboBoxTemplate2}"
-                                    ItemContainerStyle="{DynamicResource ItemStyleSimple}"
-                                    SelectionChanged="ClasseSelection_SelectionChanged" HorizontalAlignment="Stretch"
-                                    Name="ReccurenceSelection" HorizontalContentAlignment="Stretch" Height="30"
-                                    Margin="10,10,0,5">
-
-                                </ComboBox>
-
-                               
-
-                            </Grid>
-                        </Grid>
-
-                        <Grid VerticalAlignment="Stretch" Grid.Column="1" Margin="20,0,25,0">
-                                
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-
-
-                            <CheckBox x:Name="AlertCheck"  Style="{DynamicResource RoundCheckBox}" Tag="BellBadgeOutline" Click="AddRemoveAlert" Content="Alertes"/>
-                                
-
-                                <Grid Grid.Row="1" Margin="0,5,0,0" Grid.ColumnSpan="2" Name="AlertGrid">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    
-                                    <TextBlock Margin="0,0,0,0" Text="Me notifier : " HorizontalAlignment="Left" FontSize="13"
-                                           VerticalAlignment="Center" Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font}"/>
-
-                                    <ComboBox  VerticalAlignment="Bottom" Grid.Column="1"
-                                          HorizontalAlignment="Left"
-                                    Style="{DynamicResource ComboBoxStyle}" 
-                                    Template="{DynamicResource ComBoxTemplate2}"
-                                    ItemContainerStyle="{DynamicResource ItemStyle}"
-                                    SelectionChanged="ClasseSelection_SelectionChanged"
-                                    Name="Rappels"
-                                    Margin="0,10,0,5"/>
-
-                                    <TextBlock Grid.Column="2" Margin="0,0,0,0" Text=" avant" HorizontalAlignment="Right" FontSize="13"
-                                           VerticalAlignment="Center" Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font}"/>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-
-                        <CheckBox Name="AdvancedOptionCheck" Grid.Row="3" Margin="20,0,0,5" Padding="0,0,0,0" Click="ShowHideAlertes" VerticalAlignment="Stretch"
+                        <CheckBox Name="AdvancedOptionCheck" Grid.Row="2" Margin="30,0,0,5" Padding="0,0,0,0" VerticalAlignment="Stretch"
                                   Style="{DynamicResource CheckBoxDropDown}" VerticalContentAlignment="Stretch"
-                                  Content=" Alertes et réccurences"/>
-
-                    
+                                  Content=" Alertes et réccurences" Command="{Binding ChangeViewCommand}"/>
 
 
 
 
-                    <StackPanel Grid.Row="3" HorizontalAlignment="Right" Margin="0,0,20,5" VerticalAlignment="Center" Orientation="Horizontal" Grid.Column="1">
-                        <Button x:Name="Cancel" Click="CancelPage"
+                    <Grid Grid.Row="2" HorizontalAlignment="Right" Margin="0,0,30,5" VerticalAlignment="Stretch" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Button x:Name="Cancel" Click="CancelPage" Grid.Column="0"
                                     Style="{DynamicResource BasiqueBtn}" VerticalContentAlignment="Center"
                                     HorizontalAlignment="Left" FontSize="12" VerticalAlignment="Bottom"
                                     IsDefault="True" Content="Annuler" Margin="0,0,20,-1"/>
 
-                        <Button x:Name="okButton" Click="Submit" Cursor="Hand"
-                                    VerticalAlignment="Center"
+                        <Button x:Name="okButton" Command="{Binding SubmitCommand}" Cursor="Hand" Grid.Column="1"
+                                    VerticalAlignment="Stretch" Width="auto"
                                     Foreground="{DynamicResource Font_B}"  
-                                    Padding="5" HorizontalAlignment="Center"
-                                    IsDefault="True" Content="Ok"/>
+                                    Padding="12,8" HorizontalAlignment="Stretch"
+                                    IsDefault="True" Content="Sauvegarder"/>
 
-
-                    </StackPanel>
+                    </Grid>
 
                 </Grid>
                 

@@ -1,0 +1,183 @@
+﻿<UserControl x:Class="DotAgenda.View.MoreEventPageAdvanced"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DotAgenda.View"
+        xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
+        mc:Ignorable="d"
+        Background="Transparent"
+        xmlns:viewModel="clr-namespace:DotAgenda.ViewModels"
+        xmlns:fileConverter="clr-namespace:DotAgenda.View.Converter"
+        xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+        Width="800" Height="450" >
+
+    <UserControl.Resources>
+        
+        <fileConverter:FileToColor x:Key="ConverterFileToColor"/>
+        <fileConverter:FileToIcon x:Key="ConverterFileToIcon"/>
+        <fileConverter:FileToShortName x:Key="ConverterFileToShortName"/>
+
+        <fileConverter:NbObjToVisibility_Less0 x:Key="ConverterNbObjToVisibilityLess0"/>
+        <fileConverter:NbObjToVisibility_More0 x:Key="ConverterNbObjToVisibilityMore0"/>
+
+        <fileConverter:MultipleParametersCommand x:Key="MultipleParametersCommandConverter"/>
+        <fileConverter:RepeatTypeToBoolConverter x:Key="ConverterRepeatTypeToBool"/>
+        <fileConverter:DelaiStringToDelayType x:Key="ConverterDelaiStringToDelayType"/>
+
+    </UserControl.Resources>
+    
+    
+    <Border CornerRadius="20" BorderBrush="{DynamicResource Tertiary}">
+        <Border Background="{DynamicResource bg}" Margin="-1" CornerRadius="20">
+            <Grid Margin="35,15,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <!--reccurence-->
+                
+                    <Grid Margin="0,0,30,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+
+                        <CheckBox Style="{DynamicResource RoundCheckBox}" IsChecked="{Binding Path=newEvent.Reccurence, Converter={StaticResource ConverterRepeatTypeToBool}, UpdateSourceTrigger=PropertyChanged}" 
+                                  Tag="clockoutline" Name="ReccurenceCheck" Content="Réccurence : " Margin="5,0,5,0"/>
+
+
+                        <Grid Grid.Row="1" Margin="0,15,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Label Content="Tous(tes) les : " Style="{DynamicResource LabelDefaultStyle}"/>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+
+
+                                <TextBox Grid.Column="0" Margin="0,0,0,0" Text="{Binding Path=EveryXTime, Mode=TwoWay}"
+                             TextWrapping = "NoWrap" MaxLength="3" Width="auto" IsEnabled="{Binding ElementName=ReccurenceCheck, Path=IsChecked}"
+                             Padding="5,0,5,0" FontSize="15" Style="{DynamicResource TextBoxForm}"
+                             HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins">
+                                </TextBox>
+
+                                <TextBlock Name="tbDummy" Text="XXX" FontFamily="/Font/#Poppins" Visibility="Collapsed"/>
+
+                                <ComboBox Template="{DynamicResource ComboBoxTemplate1}" Grid.Column="1"  IsEnabled="{Binding ElementName=ReccurenceCheck, Path=IsChecked}"
+                                                      ItemsSource="{Binding Path=ReccurenceString}" Padding="12,8"
+                                                      SelectedItem="{Binding Path=SelectedReccurence, Mode=TwoWay}"
+                                      VerticalContentAlignment="Center" Cursor="Hand" Margin="5,0,0,0"
+                                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                                      Height="auto"
+                                      FontSize="14" FontFamily="/Font/#Poppins" BorderThickness="0">
+                                    <ComboBox.Style>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemContainerStyle" Value="{DynamicResource ItemStyle}"/>
+                                            <Setter Property="Padding" Value="0,0,0,0"/>
+                                        </Style>
+                                    </ComboBox.Style>
+                                </ComboBox>
+                            </Grid>
+
+                        </Grid>
+
+                        <Grid Grid.Row="2" Margin="0,10,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Label Content="Jusqu'au : " Foreground="{DynamicResource Font_Grey}" FontSize="13"
+                                       FontFamily="/Font/#Poppins" HorizontalAlignment="Left" Margin="0,0,0,5"/>
+
+                            <Grid Grid.Row="1">
+                                <DatePicker Style="{DynamicResource styleDatePicker}"
+                                            SelectedDate="{Binding Path=newEvent.DateDebut}"
+                                            IsEnabled="{Binding ElementName=ReccurenceCheck, Path=IsChecked}">
+                                </DatePicker>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                <Grid Grid.Row="1" Margin="0,30,30,0">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Label Content="Rappels : " Style="{DynamicResource LabelDefaultStyle}"/>
+
+                        <Button Style="{DynamicResource BtnIcon}" Content="plus" Foreground="{DynamicResource Font_Grey}"
+                                Grid.Column="1" HorizontalAlignment="Right" Margin="0" VerticalAlignment="center"/>
+
+                        <Grid Grid.Row="1" Grid.ColumnSpan="2">
+
+
+                        <ScrollViewer  x:Name="scrollviewer" Style="{DynamicResource BasicScrollViewer}" MaxHeight="150" Margin="0,0,-5,0"
+                                               PreviewMouseWheel="DataGrid_PreviewMouseWheel">
+
+
+                            <ListView ItemsSource="{Binding Path=newEvent.Alertes}" Style="{DynamicResource ListViewStyleBasic}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBox Grid.Column="0" Margin="0,0,5,0" Text="{Binding Path=Delai, Mode=TwoWay}"
+                                             TextWrapping = "NoWrap" MaxLength="3" Width="auto"
+                                             Padding="5,0,5,0" FontSize="15" Style="{DynamicResource TextBoxForm}"
+                                             HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins">
+                                            </TextBox>
+
+                                            <ComboBox
+                                                                                            SelectedItem="{Binding Path=TypeDelai, Mode=TwoWay, Converter={StaticResource ConverterDelaiStringToDelayType}}"
+                                      ItemsSource="{Binding DataContext.AlertesString, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" Margin="0,0,10,0" Style="{DynamicResource ComboBoxStyleFull}" Grid.Column="1">
+                                            </ComboBox>
+
+
+                                            <Button Style="{DynamicResource BtnIcon}" Grid.Column="2" Content="close" Foreground="{DynamicResource Font}"
+                                             HorizontalAlignment="Right" Margin="0" VerticalAlignment="center"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+
+
+
+                            </ListView>
+                        </ScrollViewer>
+
+                    </Grid>
+                </Grid>
+
+            </Grid>
+
+        </Border>
+    </Border>
+</UserControl>

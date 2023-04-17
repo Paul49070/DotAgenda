@@ -5,7 +5,7 @@
         <Setter Property="FontFamily" Value="/Font/#Poppins"/>
         <Setter Property="Foreground" Value="{DynamicResource Font_Grey}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="TextAlignment" Value="Left"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>

@@ -26,6 +26,11 @@ using System.Windows.Forms;
 using Windows.System;
 using MessageBox = System.Windows.MessageBox;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
+using System.IO;
+using DotAgenda.Models;
+using DevExpress.Data.Helpers;
+using Path = System.IO.Path;
 
 namespace DotAgenda
 {
@@ -45,34 +50,6 @@ namespace DotAgenda
 
             MailTXT.LostFocus += MailTXT_LostFocus;
             MailTXT.GotFocus += MailTXT_GotFocus;
-
-            InitSmtpList();
-        }
-
-        private void InitSmtpList()
-        {
-            SmtpList.Add("neuf", "smtp.neuf.fr");
-            SmtpList.Add("aliceadsl", "smtp.aliceadsl.fr");
-            SmtpList.Add("aol", "smtp.aol.com");
-            SmtpList.Add("att", "outbound.att.net");
-            SmtpList.Add("bluewin", "smtpauths.bluewin.ch");
-            SmtpList.Add("bouygtel", "smtp.bouygtel.fr");
-            SmtpList.Add("club-internet", "mail.club-internet.fr");
-            SmtpList.Add("free", "smtp.free.fr");
-            SmtpList.Add("gmail", "smtp.gmail.com");
-            SmtpList.Add("ifrance", "smtp.ifrance.fr");
-            SmtpList.Add("hotmail", "smtp.live.com");
-            SmtpList.Add("laposte", "smtp.laposte.fr");
-            SmtpList.Add("netcourrier", "smtp.netcourrier.com");
-            SmtpList.Add("o2", "smtp.o2.com");
-            SmtpList.Add("outlook", "smtp.live.com");
-            SmtpList.Add("sympatico", "smtphm.sympatico.ca");
-            SmtpList.Add("tiscali", "smtp.tiscali.fr");
-            SmtpList.Add("verizon", "outgoing.verizon.net");
-            SmtpList.Add("voila", "smtp.voila.fr");
-            SmtpList.Add("wanadoo", "smtp.wanadoo.fr");
-            SmtpList.Add("yahoo", "mail.yahoo.com");
-
         }
 
         private void MailTXT_GotFocus(object sender, RoutedEventArgs e)
@@ -94,60 +71,31 @@ namespace DotAgenda
             using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
             {
                 connection.Open();
-                using(SQLiteCommand command = new SQLiteCommand("SELECT ID FROM User WHERE Mail = @user AND Password = @mdp", connection))
+                using(SQLiteCommand command = new SQLiteCommand("SELECT ID Password FROM User WHERE Mail = @user and Password=@mdp ", connection))
                 {
                     command.Parameters.AddWithValue("user", MailTXT2.Text);
-                    command.Parameters.AddWithValue("mdp", mdpTXT.Password.ToString());
+                    command.Parameters.AddWithValue("mdp", Primitives._prim.CryptPassword(mdpTXT.Password.ToString()));
 
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         if(reader.Read())
                         {
-                            UserFinded = true;
-                            WrongIDTXT.Visibility = Visibility.Hidden;
-                            App.ID = reader.GetInt32(0);
+                            //string enteredPassword = mdpTXT.Password.ToString();
+                                UserFinded = true;
+                                WrongIDTXT.Visibility = Visibility.Hidden;
+                                App.ID = reader.GetInt32(0);
                         }
                     }
                 }
             }
 
             if (!UserFinded)
-            {
                 WrongIDTXT.Visibility = Visibility.Visible;
-            }
 
             else
-            {
-                UpdateConnectionDB();
                 DialogResult = true;
-            }
         }
-
-
-        private void UpdateConnectionDB()
-        {
-            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
-            {
-                connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand("UPDATE User SET EstConnecte = 0 where (id!=@id)", connection))
-                {
-                    command.Parameters.AddWithValue("id", App.ID);
-                    command.ExecuteNonQuery();
-                }
-
-                using (SQLiteCommand command_Update = new SQLiteCommand("UPDATE User SET EstConnecte = @connection WHERE ID = @id", connection))
-                {
-                    int RememberConnection;
-                    if (CheckBoxResterConnecter.IsChecked == true) RememberConnection = 1;
-                    else RememberConnection = 0;
-
-                    command_Update.Parameters.AddWithValue("connection", RememberConnection);
-                    command_Update.Parameters.AddWithValue("id", App.ID);
-
-                    command_Update.ExecuteNonQuery();
-                }
-            }
-        }
+        
 
         private void AddUser()
         {
@@ -161,161 +109,38 @@ namespace DotAgenda
             using(SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
             {
                 connection.Open();
-                DataBase._db.AddUser(connection, mail, mdp, ResterConnecter);
-                App.ID = DataBase._db.GetUserID(connection, mail, mdp);
+                bool UserDontExist = DataBase._db.CheckDoubleUser(connection, mail);
 
-                if (App.ID == -1)
+                if (UserDontExist)
                 {
-                    //throw exception
+                    DataBase._db.AddUser(connection, mail, mdp, ResterConnecter);
+                    App.ID = DataBase._db.GetUserID(connection, mail);
+
+                    if (App.ID == -1)
+                    {
+                        //throw exception
+                    }
+
+                    DataBase._db.AddUserDetails(connection, prenom, nom, mail);
+                    DataBase._db.AddDefaultClasseDB(connection);
+
+                    string code = Primitives.GenerateRandomString();
+
+                    SendMail(prenom, mail, code);
+
+
+                    DialogResult = true;
                 }
 
-                DataBase._db.AddUserDetails(connection, prenom, nom, mail);
-                DataBase._db.AddDefaultClasseDB(connection);
-
-                UpdateConnectionDB();
-                SendMail(mail);
-
-
-                DialogResult = true;
+                else MessageBox.Show("Mail déjà pris !!");
             }
         }
 
-        private void SendMail(string mailAdr)
+        
+
+        private void SendMail(string prenom, string mailAdr, string code)
         {
-            int Debutsmtp = mailAdr.IndexOf("@")+1;
-            string server_temp = mailAdr.Substring(Debutsmtp, mailAdr.Length - Debutsmtp);
-            int FinSmtp = server_temp.IndexOf(".");
-            server_temp = server_temp.Substring(0, FinSmtp);
-            server_temp = server_temp.ToLower();
-            string server = SmtpList[server_temp];
-
-            MailAddress from = new MailAddress("DotAgendaContact1@gmail.com");
-            MailAddress to = new MailAddress(mailAdr);
-
-
-
-            MailMessage message = new MailMessage(from, to);
-            message.Subject = "Création de compte .agenda !";
-            string Body = @"<!DOCTYPE html>
-
-<html>
-<head>
-<title></title>
-<meta content=""text/html; charset=utf-8"" http-equiv=""Content-Type""/>
-<meta content=""width=device-width, initial-scale=1.0"" name=""viewport""/>
-<html>
-<style>
-	@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
-
-
-	body
-	{
-		font-family: 'Lucida', monospace;
-	}
-
-	h1
-	{
-		font-family: 'Lucida', monospace;
-		text-align: center;
-		color: black;
-		font-size: 30px;
-	}
-
-	.box {
-            display: flex;
-            align-content: center;
-            text-align: center;
-            justify-content: center;
-          }
-      
-
-	h2
-	{
-		font-family: 'Lucida', monospace;
-		text-align: center;
-		color: black;
-		font-weight: normal;
-		font-size: 22px;
-	}
-
-	#point{
-		color:#573fff;
-		letter-spacing: -1px;
-		font-size: 25px;
-	}
-
-	p
-	{
-		text-align: center;
-		font-size: 14px;
-
-	}
-</style>
-<body>
-	<table width=""100%"" border=""0"" cellspacing=""0"" cellpadding=""0"">
-    <tr>
-    	<td>
-    	<h1>
-		.agenda
-	</h1>
-    </td>
-</td>
-
-
-</tr>
-	<tr>
-	<td width=""auto"" align=""center"">        
-	    	<img src=cid:ImageMail width=""200"">
-
-		</td>
-    </tr>
-
-<tr height= ""5px"">
-	<td style=""font-weight: 2000px"">
-	<h1 style=""font-size: 22px"">
-		Bienvenue !
-	</h1>
-	<p>
-		Votre compte à bien été créé !
-	</p>
-</td>
-</tr>
-
-</table>
-	
-
-</body>
-</html>";
-            message.IsBodyHtml = true;
-
-            AlternateView htmlView = AlternateView.CreateAlternateViewFromString(Body, null, "text/html");
-
-            LinkedResource mailImage = new LinkedResource("C:\\Users\\paull\\OneDrive\\Bureau\\DotAgenda\\DotAgenda\\DotAgenda\\Img\\Mail\\HappyMail.png");
-            mailImage.ContentId = "ImageMail";
-
-            htmlView.LinkedResources.Add(mailImage);
-
-            message.AlternateViews.Add(htmlView);
-            //message.Body = @"Bienvenue ! Ton compte à bien été créer. Au plaisir d'organiser ton planning ensemble !";
-
-
-            var smtpClient = new SmtpClient("smtp.gmail.com")
-            {
-                Port = 587,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                EnableSsl = true,
-                Credentials = new NetworkCredential("DotAgendaContact1@gmail.com", "lantpoajyrhsgone")
-            };            // Include credentials if the server requires them.
-
-            try
-            {
-                smtpClient.Send(message);
-            }
-            catch
-            {
-                MessageBox.Show("Impossible d'envoyer le mail de confirmation !", "Error", MessageBoxButton.OK);
-            }
+            new Email(prenom, mailAdr, code);
         }
 
         private void InscriptionClick(object sender, RoutedEventArgs e)
@@ -380,7 +205,7 @@ namespace DotAgenda
         }
         private void MailTXT_TextChanged(object sender, TextChangedEventArgs e)
         {
-            bool result=false;
+            bool result;
 
 
             if (MailTXT.Text.Length > 0)
@@ -406,28 +231,6 @@ namespace DotAgenda
                 CorrectImgMailCheck.Visibility = Visibility.Hidden;
                 CorrectImgMailCross.Visibility = Visibility.Hidden;
             }
-        }
-
-        private void WrongValues_Anim()
-        {
-            DoubleAnimation widthAnimation = new DoubleAnimation
-            {
-                From = 0,
-                To = 100,
-                Duration = TimeSpan.FromSeconds(2),
-                AutoReverse = true,
-            };
-
-
-            //this.RegisterName("WidthNav", NavBar.Width);
-            //Storyboard.SetTargetName(widthAnimation, "WidthNav");
-            Storyboard.SetTargetProperty(widthAnimation, new PropertyPath(Window.LeftProperty));
-            Storyboard.SetTarget(widthAnimation, LoginFormXML);
-
-            Storyboard s = new Storyboard();
-            s.Children.Add(widthAnimation);
-            s.Duration = TimeSpan.FromSeconds(20);
-            s.Begin();
         }
 
         private void MailTXT2_TextChanged(object sender, TextChangedEventArgs e)

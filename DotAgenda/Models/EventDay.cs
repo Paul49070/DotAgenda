@@ -1,8 +1,14 @@
 ﻿using DotAgenda.MethodClass;
 using DotAgenda.MethodClass.DataBaseMethods;
+using DotAgenda.View.Popups;
+using Microsoft.SqlServer.Management.Smo.Agent;
+using Newtonsoft.Json;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data.SQLite;
+using System.IO.Pipes;
+using System.IO;
 using System.Linq;
 using System.Windows;
 
@@ -23,7 +29,22 @@ namespace DotAgenda.Models
         public ObservableCollection<Fichier> Fichiers
         {
             get { return _Fichiers; }
-            set { _Fichiers = value; }
+            set 
+            { 
+                _Fichiers = value;
+                OnPropertyChanged(nameof(Fichiers));
+            }
+        }
+
+        private ObservableCollection<Alerte> _Alertes;
+        public ObservableCollection<Alerte> Alertes
+        {
+            get { return _Alertes; }
+            set
+            {
+                _Alertes = value;
+                OnPropertyChanged(nameof(_Alertes));
+            }
         }
 
 
@@ -88,8 +109,63 @@ namespace DotAgenda.Models
                     new GroupEvent(this.GroupID, this);
                 }
             }
+
+            Alertes = new ObservableCollection<Alerte>();
+            
+            if(ID == "null")
+            {
+
+            }
+
+            /*AjouterAlerte(new Alerte(this, 4, Alerte.TypeMoyenEnvoie.Notification, Alerte.DelaiType.Day));
+            AjouterAlerte(new Alerte(this, 8, Alerte.TypeMoyenEnvoie.Notification, Alerte.DelaiType.Hour));
+            AjouterAlerte(new Alerte(this, 1, Alerte.TypeMoyenEnvoie.Notification, Alerte.DelaiType.Week));*/
         }
 
+        public void AjouterAlerte(Alerte a)
+        {
+            MessageBox.Show("Alert to add");
+            if (!Alertes.Contains(a))
+                Alertes.Add(a);
+
+            using (SQLiteConnection connection = new SQLiteConnection(App.SystemDB_Path))
+            {
+                connection.Open();
+                using (SQLiteCommand commandAddAlerte = new SQLiteCommand("INSERT INTO Alertes (UserID, EventID, ID, DateLancement, Mail, Notification) VALUES(@userID, @eventID, @ID, @launch, @mail, @notif)", connection))
+                {
+                    int mail, notif;
+                    if (a.MoyenEnvoi == Alerte.TypeMoyenEnvoie.Both)
+                    {
+                        mail = 1;
+                        notif = 1;
+                    }
+
+                    else if (a.MoyenEnvoi == Alerte.TypeMoyenEnvoie.Notification)
+                    {
+                        notif = 1;
+                        mail = 0;
+                    }
+
+                    else
+                    {
+                        notif = 0;
+                        mail = 0;
+                    }
+
+
+                    commandAddAlerte.Parameters.AddWithValue("userID", App.ID);
+                    commandAddAlerte.Parameters.AddWithValue("eventID", this.ID);
+                    commandAddAlerte.Parameters.AddWithValue("ID",a.ID);
+                    commandAddAlerte.Parameters.AddWithValue("launch", a.HeureEnvoi.ToString("s"));
+                    commandAddAlerte.Parameters.AddWithValue("mail", mail);
+                    commandAddAlerte.Parameters.AddWithValue("notif", notif);
+
+                    commandAddAlerte.ExecuteNonQuery();
+                }
+            }
+        }
+
+        
         public EventDay Clone(bool GenerateNewGroupID = false)
         {
             if(GenerateNewGroupID)
@@ -122,14 +198,30 @@ namespace DotAgenda.Models
             DeleteEventFromGroup();
             GestionnaireEvent._global.A[numY].M[numM].J[numJ].DeleteEventToList(this);
             DataBaseEvents._dbEvent.DeleteEventToDB(this);
+            DeleteAllAlerts();
         }
 
-        public bool AddFile(Fichier file)
+        private void DeleteAllAlerts()
         {
-            if (Fichiers.IndexOf(file) == -1)
+            foreach(Alerte a in Alertes)
+            {
+                a.SendAlertPipe("Remove");
+            }
+
+            Alertes.Clear();
+        }
+
+        public bool AttachFile(Fichier file)
+        {
+            ObservableCollection<Fichier> FichiersTemp = Fichiers;
+
+            if (FichiersTemp.IndexOf(file) == -1)
             {
                 file.AttachToEvent(this);
-                Fichiers.Add(file);
+
+                FichiersTemp.Insert(0,file);
+                Fichiers = FichiersTemp;
+
                 return true;
             }
 
@@ -140,8 +232,13 @@ namespace DotAgenda.Models
 
         public bool RemoveFile(Fichier file)
         {
-            if (Fichiers.Remove(file))
+            ObservableCollection<Fichier> FichiersTemp = Fichiers;
+            if (FichiersTemp.Remove(file))
+            {
+                Fichiers = FichiersTemp;
                 return true;
+            }
+
             else return false;
         }
 

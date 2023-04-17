@@ -40,6 +40,8 @@ using System.Windows.Media.Effects;
 using System.ComponentModel;
 using DotAgenda.MethodClass;
 using DotAgenda.MethodClass.DataBaseMethods;
+using Newtonsoft.Json;
+using System.IO.Pipes;
 
 namespace DotAgenda
 {
@@ -82,11 +84,13 @@ namespace DotAgenda
             SearchBox.LostFocus += SearchBox_LostFocus;
             SearchBox.GotFocus += SearchBox_GotFocus;
             SearchBarItems.ItemsSource= FilteredEventSearch;
-        }
 
+            
+        }       
 
-        public void AddEvent(object sender, RoutedEventArgs e)
+        public void AddEvent(object sender, RoutedEventArgs eventArgs)
         {
+
             Activate();            //on active la MainWindow pour prévenir le cas ou on la met en arrière plan et on revient dessus
             Popup frm1 = new Popup
             {
@@ -109,8 +113,12 @@ namespace DotAgenda
         {
             ProfilPicture.ContextMenu.Visibility = Visibility.Hidden;
 
-            _db.Deconnect();
-            
+            //_db.Deconnect();
+
+            DataBase._db.Deconnect();
+
+            Primitives._prim.KillNotificationApp();
+
             Application.Current.Shutdown();
             System.Windows.Forms.Application.Restart();
         }

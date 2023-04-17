@@ -16,6 +16,8 @@ using static DotAgenda.Models.EventDay;
 using System.Web.UI.Design;
 using System.Windows;
 using Microsoft.SqlServer.Management.XEvent;
+using System.Security.Cryptography;
+using System.Diagnostics;
 
 namespace DotAgenda.MethodClass
 {
@@ -30,10 +32,81 @@ namespace DotAgenda.MethodClass
 
         }
 
+        public bool IsNotificationAppAlreadyRunning()
+        {
+            Process[] instances = Process.GetProcessesByName("NotificationSystemDotAgenda");
+            return instances.Length > 0;
+        }
+
+        public void KillNotificationApp()
+        {
+            if(IsNotificationAppAlreadyRunning())
+            {
+                Process[] actualInstance = Process.GetProcessesByName("NotificationSystemDotAgenda");
+                
+                foreach(Process p in actualInstance)
+                {
+                    p.Kill();
+                }
+            }
+        }
+
+
+        
+
+        public void StartNotificationApp()
+        {
+            if (!IsNotificationAppAlreadyRunning())
+            {
+                string NotificationSystemPath = "C:\\Users\\paull\\OneDrive\\Bureau\\DotAgenda\\NotificationSystemDotAgenda\\NotificationSystemDotAgenda\\bin\\Debug\\net6.0-windows10.0.17763.0\\NotificationSystemDotAgenda.exe";
+                string args = App.ID.ToString();
+                ProcessStartInfo processStartInfo = new ProcessStartInfo(NotificationSystemPath, args);
+
+                try
+                {
+                    Process.Start(processStartInfo);
+                }
+
+                catch (Exception e)
+                {
+                    MessageBox.Show("Impossible de lancer l'app de notif : " + e.Message);
+                }
+            }
+        }
+
+        public static string GenerateRandomString(int length = 8)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
         public string CryptPassword(string password)
         {
-            string cryptedPassword = "";
-            return cryptedPassword;
+            using (var sha256 = SHA256.Create())
+            {
+                byte[] hashedPassword = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedPassword);
+            }
+        }
+
+        public string DecryptPassword(string cryptedPassword)
+        {
+            MessageBox.Show(cryptedPassword);
+
+            byte[] encryptedPassword = Encoding.UTF8.GetBytes(cryptedPassword);
+
+            byte[] decryptedPassword = ProtectedData.Unprotect(
+                   encryptedPassword,
+                   null,
+                   DataProtectionScope.CurrentUser);
+
+            string stringDecryptPassword = Convert.ToBase64String(decryptedPassword);
+
+            MessageBox.Show(stringDecryptPassword);
+
+            return stringDecryptPassword;
         }
 
         public string GenerateID()
@@ -115,8 +188,7 @@ namespace DotAgenda.MethodClass
 
         public Fichier CreateFile(string nomFichier)
         {
-            string fileID = GenerateID();
-            Fichier ficAdded = new Fichier(fileID, nomFichier);
+            Fichier ficAdded = new Fichier(nomFichier);
 
             if (DataBaseFile._dbFile.AddFileToDB(ficAdded))
             {
@@ -125,24 +197,24 @@ namespace DotAgenda.MethodClass
             return ficAdded;
         }
 
-
+        
         public void AddFileToEvent(string nomFichier, EventDay evenement)
         {
-            Fichier fic = CreateFile(nomFichier);
+            Fichier fic;
 
-            if (fic.Type == null)
+            if (GlobalDict._dict.DictFile.Keys.ToList().IndexOf(nomFichier) == -1)
             {
-                fic = DataBaseFile._dbFile.GetFileWithID(fic.ID);
+                fic = new Fichier(nomFichier);
+                DataBaseFile._dbFile.AddFileToDB(fic);
             }
-
-            if (evenement.AddFile(fic))
-                DataBaseFile._dbFile.AddFileToDB_Event(fic, evenement);
 
             else
-            {
-                var event_window = new AlreadyImportedFile(true);
-                event_window.Show();
-            }
+                fic = GlobalDict._dict.DictFile[nomFichier];
+
+            if (evenement.AttachFile(fic))
+                DataBaseFile._dbFile.AddFileToDB_Event(fic, evenement);
+
+            else new AlreadyImportedFile(AlreadyAttached: true).Show();
         }
 
 

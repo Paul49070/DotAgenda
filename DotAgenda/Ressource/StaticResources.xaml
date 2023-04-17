@@ -14,9 +14,9 @@
     <SolidColorBrush x:Key="Event_Rose" Color="#ff63aa"/>
     <SolidColorBrush x:Key="Event_Bleu" Color="#3bbff5"/>
     <SolidColorBrush x:Key="Event_Orange" Color="#f98358"/>-->
-    
-    
-    
+
+    <FontFamily x:Key="PoppinsFontFamily">pack://application:,,,/Font/#Poppins</FontFamily>
+
     <SolidColorBrush x:Key="Primary" Color="#ea5e5c" />
     <SolidColorBrush x:Key="Secondary" Color="#121418" />
     <SolidColorBrush x:Key="PopupBG" Color="#25282e"/>
@@ -26,13 +26,14 @@
     <SolidColorBrush x:Key="Contrast_Opacity" Color="#20573fff" />
     <SolidColorBrush x:Key="Evenement" Color="#f9bb38" />
     <SolidColorBrush x:Key="MouseOverEvent" Color="#FF9C7E"/>
-    <SolidColorBrush x:Key="bg" Color="#1b1f24"/>
+    <SolidColorBrush x:Key="bg" Color="#282828"/>
     <SolidColorBrush x:Key="bgbis" Color="#262554"/>
-    <SolidColorBrush x:Key="Font" Color="White"/>
+    <SolidColorBrush x:Key="Font" Color="#D8D7DC"/>
     <SolidColorBrush x:Key="Font_Search" Color="White"/>
     <SolidColorBrush x:Key="Event_Rose" Color="#ff63aa"/>
     <SolidColorBrush x:Key="Event_Bleu" Color="#3bbff5"/>
     <SolidColorBrush x:Key="Event_Orange" Color="#f98358"/>
+    <SolidColorBrush x:Key="FieldColor" Color="#26252B"/>
 
     <SolidColorBrush x:Key="ClasseFont" Color="#FFFFFF"/>
 
@@ -42,6 +43,7 @@
     <SolidColorBrush x:Key="Font_W" Color="#071220"/>
     <SolidColorBrush x:Key="Contrast_W" Color="#573fff" />
     <SolidColorBrush x:Key="PopupBG_W" Color="#f5f5f5"/>
+    <SolidColorBrush x:Key="FieldColor_W" Color="#F6F6F6"/>
 
 
     <SolidColorBrush x:Key="Secondary_B" Color="#121418" />
@@ -50,7 +52,8 @@
     <SolidColorBrush x:Key="Font_B" Color="White"/>
     <SolidColorBrush x:Key="Contrast_B" Color="#573fff" />
     <SolidColorBrush x:Key="PopupBG_B" Color="#25282e"/>
-    
+    <SolidColorBrush x:Key="FieldColor_B" Color="#26252B"/>
+
 
     <SolidColorBrush x:Key="Font_Grey" Color="#696969"/>
 

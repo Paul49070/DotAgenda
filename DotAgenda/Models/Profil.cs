@@ -69,7 +69,15 @@ namespace DotAgenda.Models
             set { _Nom = value; }
         }
 
-        public Profil(int ID, bool light, bool bmail, bool notif, string mail, string prenom, string nom)
+        private bool _RememberMe;
+        public bool RememberMe
+        {
+            get { return _RememberMe; }
+            set { _RememberMe = value; }
+        }
+
+
+        public Profil(int ID, bool light, bool bmail, bool notif, string mail, string prenom, string nom, bool rememberMe = true)
         {
             id = ID;
             lightMode = light;
@@ -80,6 +88,8 @@ namespace DotAgenda.Models
 
             Prenom = prenom;
             Nom = nom;
+
+            RememberMe = rememberMe;
         }
     }
 }

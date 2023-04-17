@@ -10,9 +10,8 @@
              xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf">
 
     <UserControl.Resources>
-        
+
         <ResourceDictionary>
-            
             <ControlTemplate TargetType="{x:Type Button}" x:Key="btnstyle">
                 <Grid>
                     <Border Background="Transparent"
@@ -82,8 +81,8 @@
 
         <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,10,0,0">
             <Button Click="TodayUpdate" Style="{DynamicResource BasiqueBtnContrast}" VerticalAlignment="Center" FontSize="12" Margin="0,10,25,0" Content="Aujourd'hui"/>
-            <Button Click="MoinsJours" Style="{DynamicResource GrapheBtn}" Margin="0,0,5,0" FontSize="12" Content="&lt;"/>
-            <Button Click="PlusJours" Style="{DynamicResource GrapheBtn}" Margin="0,0,15,0" FontSize="12" Content=">"/>
+            <Button Click="MoinsJours" Style="{DynamicResource GrapheBtn}" Margin="0,0,5,0" Content="&lt;"/>
+            <Button Click="PlusJours" Style="{DynamicResource GrapheBtn}" Margin="0,0,15,0" Content=">"/>
         </StackPanel>
 
         <Grid Grid.Column="0" Grid.Row="1" Margin="0,25,0,0">
@@ -100,18 +99,17 @@
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="1.1*"/>
                 <ColumnDefinition Width="*"/>
 
             </Grid.ColumnDefinitions>
 
             <!--Grand Jour-->
-            <Border Background="{DynamicResource Secondary}"
+            <Border     Background="{DynamicResource Secondary}"
                         Margin="0,0,0,0" CornerRadius="20"
-                        Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+                        Grid.Column="0" Grid.RowSpan="2"
                         BorderThickness="0" BorderBrush="{DynamicResource Tertiary}">
+                
                 <Grid Margin="20,0,10,0" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="75"/>
@@ -141,15 +139,13 @@
                                 HorizontalAlignment="Right" VerticalAlignment="center"
                                 Background="{DynamicResource Contrast}">
                             <TextBlock x:Name="Jour0Num" Text="{Binding Path=Date, StringFormat={}{0:dd}}"
-                                     TextAlignment="Center"  Style="{DynamicResource numTXTjour}"
+                                     TextAlignment="Center" HorizontalAlignment="Center"  Style="{DynamicResource CasualTextBlock}"
                                      FontSize="18"/>
                         </Border>
                     </Grid>
 
 
-                    <ScrollViewer  Margin="0,0,5,7" x:Name="scrollviewer" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                               Grid.Column="0"  Grid.Row="1" Grid.ColumnSpan="2" PreviewMouseWheel="DataGrid_PreviewMouseWheel"
-                               ScrollViewer.VerticalScrollBarVisibility="Auto" Background="Transparent">
+                    <ScrollViewer  Margin="0,0,5,7" x:Name="scrollviewer" Style="{DynamicResource BasicScrollViewer}" Grid.Row="1" Grid.ColumnSpan="2" PreviewMouseWheel="DataGrid_PreviewMouseWheel">
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -164,13 +160,13 @@
                                 </Grid.RowDefinitions>
 
 
-                                <ListView ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.ColumnSpan="2" HorizontalContentAlignment="Stretch"
-                                        ScrollViewer.VerticalScrollBarVisibility="Disabled" x:Name="ListeHeure" HorizontalAlignment="Stretch" Padding="0"
-                                        ScrollViewer.CanContentScroll="False" ItemContainerStyle="{DynamicResource containerStyle1}" Background="Transparent">
+                                <ListView Style="{DynamicResource ListViewStyleBasic}" Grid.ColumnSpan="2" Padding="0"
+                                          x:Name="ListeHeure">
+                                    
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
-                                            <Border BorderThickness="0,0,0,1" Height="70" HorizontalAlignment="Stretch" Margin="0,0,0,0" Opacity="0.5" Padding="0" Background="Transparent" BorderBrush="{DynamicResource Font_Grey}">
-                                                <Grid Margin="0,0,0,0">
+                                            <Border BorderThickness="0,0,0,1" Height="70" HorizontalAlignment="Stretch" Opacity="0.5" BorderBrush="{DynamicResource Font_Grey}">
+                                                <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="auto"/>
                                                         <ColumnDefinition/>
@@ -179,11 +175,11 @@
 
                                                         <StackPanel Margin="0,10,0,0" Orientation="Horizontal" Grid.RowSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 
-                                                            <TextBlock VerticalAlignment="Center" Text="{Binding}" Foreground="{DynamicResource Font_Grey}" 
-                                                                       Style="{DynamicResource numTXTjour}" FontSize="12" HorizontalAlignment="Stretch" TextAlignment="Right"></TextBlock>
+                                                            <TextBlock Text="{Binding}" Foreground="{DynamicResource Font_Grey}" 
+                                                                       Style="{DynamicResource CasualTextBlock}" FontSize="12" TextAlignment="Right"></TextBlock>
                                                         </StackPanel>
 
-                                                    <Grid Grid.Column="1" Margin="10,0,10,0">
+                                                    <Grid Grid.Column="1" Margin="10,0">
 
                                                         <Grid.Resources>
                                                             <Style TargetType="Border">
@@ -225,19 +221,14 @@
 
                             </Grid>
 
-                            <ListView x:Name="ListeEvent" ItemsSource="{Binding}" Grid.Column="1"
-                                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                        ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                                        ScrollViewer.CanContentScroll="False"
-                                        Margin="0,.5,0,0" Padding="0"
-                                        Background="Transparent" BorderThickness="0" VerticalAlignment="Stretch"
-                                        HorizontalContentAlignment="Stretch" ItemContainerStyle="{StaticResource containerStyle1}">
+                            <ListView x:Name="ListeEvent" ItemsSource="{Binding}" Grid.Column="1" Padding="0"
+                                        Style="{DynamicResource ListViewStyleBasic}" Margin="0,-.5,0,0">
 
                                 <ListView.ItemTemplate>
 
                                     <DataTemplate>
 
-                                        <Border VerticalAlignment="Top" BorderThickness="0">
+                                        <Border VerticalAlignment="Top">
                                             <Border.Margin>
                                                 <MultiBinding Converter="{StaticResource ConverterMarginRow}" UpdateSourceTrigger="PropertyChanged">
                                                     <Binding Path="."/>
@@ -245,11 +236,7 @@
                                                 </MultiBinding>
                                             </Border.Margin>
 
-                                            <ListView Grid.Column="1"
-                                            Name="ListViewB" ItemsSource="{Binding}" HorizontalAlignment="Stretch"  VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
-                                              ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemContainerStyle="{DynamicResource containerStyle1}"
-                                              ScrollViewer.VerticalScrollBarVisibility="Disabled" Margin="0"
-                                              HorizontalContentAlignment="Stretch">
+                                            <ListView Name="ListViewB" ItemsSource="{Binding}" Style="{DynamicResource ListViewStyleBasic}">
 
                                             <ListBox.ItemsPanel>
                                                 <ItemsPanelTemplate>
@@ -269,13 +256,10 @@
                                                 ScrollViewer.CanContentScroll="False" Margin="0"
                                                 VerticalAlignment="Stretch"
                                                 HorizontalContentAlignment="Stretch" ItemContainerStyle="{StaticResource containerStyle1}">
-
-
-
+                                                            
                                                             <ListView.ItemTemplate>
                                                                 <DataTemplate>
-                                                                    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                                                   Background="Transparent" BorderThickness="0" BorderBrush="Transparent">
+                                                                    <Border BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                                                         <Border.Margin>
                                                                             <MultiBinding Converter="{StaticResource ConverterMarginFromDuree}" UpdateSourceTrigger="PropertyChanged">
                                                                                 <Binding Path="." />
@@ -286,11 +270,9 @@
 
 
                                                                         <Button x:Name="Item" Click="ClickOnEvent" Padding="0,4"
-                                                        BorderThickness="4" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
-                                                        Drop="DropFile" AllowDrop="True" BorderBrush="{DynamicResource Contrast}" Style="{DynamicResource BasiqueBtnList}"
-                                                     
-                                                        DragEnter="DragOnEvent" DragLeave="DragOffEvent" HorizontalContentAlignment="Stretch"
-                                                        HorizontalAlignment="Stretch">
+                                                                        BorderThickness="4" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                                                        Drop="DropFile" AllowDrop="True" BorderBrush="{DynamicResource Contrast}" Style="{DynamicResource BasiqueBtnList}"
+                                                                        DragEnter="DragOnEvent" DragLeave="DragOffEvent">
 
                                                                             <Button.MinHeight>
                                                                                 <MultiBinding Converter="{StaticResource ConverterDureeToHeight}" UpdateSourceTrigger="PropertyChanged">
@@ -299,14 +281,10 @@
                                                                                 </MultiBinding>
                                                                             </Button.MinHeight>
 
-                                                                            <!--Height="{Binding Path=IsVisible, Converter={StaticResource ConverterVisibility}, UpdateSourceTrigger=PropertyChanged}"-->
 
+                                                                            <Border Background="{DynamicResource PopupBG}" Padding="0,10" CornerRadius="10">
 
-                                                                            <Border HorizontalAlignment="stretch" VerticalAlignment="Stretch" Background="{DynamicResource PopupBG}" Height="auto" Padding="0,10" Margin="0" CornerRadius="10">
-
-                                                                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="auto" Margin="0,0,15,0">
-
-
+                                                                                <Grid Height="auto" Margin="0,0,15,0">
 
                                                                                     <Grid.ColumnDefinitions>
                                                                                         <ColumnDefinition Width="auto"/>
@@ -320,42 +298,29 @@
                                                                                         <RowDefinition Height="*"/>
                                                                                     </Grid.RowDefinitions>
 
-                                                                                    <Border Background="{Binding Path=Classe, Converter={StaticResource ConverterToColor}}" 
-                                                                        Width="4" VerticalAlignment="Stretch" CornerRadius="2" Margin="0,12,10,12" Grid.RowSpan="2" />          
-                                                                                   
+                                                                                    <Border Background="{Binding Path=Classe, Converter={StaticResource ConverterToColor}}" Width="4" CornerRadius="2" Margin="0,12,10,12" Grid.RowSpan="2" />
 
-                                                                                    <TextBlock Grid.Column="1" x:Name="TitreTXT" Margin="5,0,0,0"
-                                                                 HorizontalAlignment="Left"
-                                                                 TextWrapping = "NoWrap" TextTrimming="WordEllipsis"
-                                                                 FontFamily="/Font/#Poppins"
-                                                                 Text="{Binding Titre}"
-                                                                 Foreground="{DynamicResource Font}"
-                                                                 Background="Transparent"                                                          
-                                                                 FontSize="14"/>
+
+                                                                                    <TextBlock Grid.Column="1" x:Name="TitreTXT" Margin="5,0,0,0" VerticalAlignment="Top"
+                                                                                         Style="{DynamicResource CasualTextBlock}" TextTrimming="WordEllipsis"
+                                                                                         Text="{Binding Titre}"/>
 
                                                                                     <StackPanel Grid.Column="1" Grid.Row="1" Margin="5,0,10,0" Orientation="Horizontal" VerticalAlignment="Bottom">
 
                                                                                         <TextBlock Grid.Row="1" Grid.Column="2"
-                                                                   FontFamily="/Font/#Poppins"
-                                                                   TextWrapping = "Wrap"
-                                                                   Background="Transparent"
-                                                                   Foreground="{DynamicResource Font_Grey}"
-                                                                   HorizontalAlignment="Left"
-                                                                   TextAlignment="left"
-                                                                   FontSize="12">
+                                                                                       TextWrapping = "Wrap" Style="{DynamicResource CasualTextBlock}"
+                                                                                       Foreground="{DynamicResource Font_Grey}"
+                                                                                       FontSize="12">
                                                                                             <TextBlock.Text>
                                                                                                 <Binding Path="DateDebut" StringFormat="{}{0:HH:mm} • " />
                                                                                             </TextBlock.Text>
                                                                                         </TextBlock>
 
                                                                                         <TextBlock Grid.Row="1" Grid.Column="2"
-                                                                   FontFamily="/Font/#Poppins"
-                                                                   TextWrapping = "Wrap" TextTrimming="WordEllipsis"
-                                                                   Background="Transparent"
-                                                                   Foreground="{DynamicResource Font_Grey}"
-                                                                   HorizontalAlignment="Left"
-                                                                   TextAlignment="left"
-                                                                   FontSize="12">
+                                                                                       TextWrapping = "Wrap" TextTrimming="WordEllipsis"
+                                                                                       Foreground="{DynamicResource Font_Grey}"
+                                                                                       Style="{DynamicResource CasualTextBlock}"
+                                                                                       FontSize="12">
                                                                                             <TextBlock.Text>
                                                                                                 <Binding Path="DateFin" StringFormat="{}{0:HH:mm}" />
                                                                                             </TextBlock.Text>
@@ -371,9 +336,9 @@
 
 
                                                                                     <Button
-                                                                Grid.Column="3" Click="ContextMenuEvent"
-                                                                HorizontalAlignment="Right" VerticalAlignment="Top"
-                                                                Content="DotsHorizontal"  Style="{DynamicResource MoreBtnIcon}">
+                                                                                    Grid.Column="3" Click="ContextMenuEvent"
+                                                                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                                                    Content="DotsHorizontal"  Style="{DynamicResource MoreBtnIcon}">    
 
                                                                                         <Button.ContextMenu>
                                                                                             <ContextMenu FontSize="13" FontWeight="Normal" Style="{DynamicResource ContextMenuStyle}" Name="ContentBtn">
@@ -415,14 +380,14 @@
                 </Grid>
             </Border>
 
-            <Grid Grid.Column="3" Grid.RowSpan="2" Margin="20,0,0,0">
+            <Grid Grid.Column="1" Grid.RowSpan="2" Margin="20,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1.5*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <Border BorderBrush="{DynamicResource Tertiary}" BorderThickness="0">
-                    <Grid>
+                    <Grid Margin="0,20,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
                             <RowDefinition/>
@@ -433,13 +398,13 @@
                         </Grid.ColumnDefinitions>
 
 
-                        <TextBox Text="Tâche du jour" Style="{DynamicResource DotTextBlock}" Margin="25,20,0,10"
+                        <TextBox Text="Tâche du jour" Style="{DynamicResource DotTextBlock}" Margin="25,0,0,10"
                                  FontSize="18" Background="{DynamicResource Contrast}" BorderThickness="3"
                                  Padding="0,0,3,7" VerticalAlignment="Center" HorizontalAlignment="Left">
                         </TextBox>
 
                         <Button Content="Plus" Grid.Column="1" Margin="0,0,20,2" Click="AddToDo"
-                                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Style="{DynamicResource BtnIcon}" 
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" Style="{DynamicResource BtnIcon}" 
                                         Width="auto" FontSize="12" Height="30" x:Name="AjouterTitre"/>
 
 
@@ -533,19 +498,19 @@
                         </Grid.RowDefinitions>
 
 
-                        <Grid Margin="0,0,0,0">
+                        <Grid Margin="0,20,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBox Text="Prochain évènement" x:Name="TitreDetailsEvent" Style="{DynamicResource DotTextBlock}" Margin="0,20,0,5"
+                            <TextBox Text="Prochain évènement" x:Name="TitreDetailsEvent" Style="{DynamicResource DotTextBlock}" Margin="0,0,0,5"
                                  FontSize="18" Background="{DynamicResource Contrast}" BorderThickness="3"
                                  Padding="0,0,3,7" VerticalAlignment="Center" HorizontalAlignment="Left">
                             </TextBox>
 
                             <Button Grid.Column="1" Content="dotshorizontal" Click="ClickOnEvent" FontSize="12"
-                                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Style="{DynamicResource BtnIcon}" 
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" Style="{DynamicResource BtnIcon}" 
                                         x:Name="ModifierEvent"/>
                         </Grid>
 
@@ -563,9 +528,9 @@
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
 
-                                        <StackPanel Orientation="vertical" Grid.Column="0" VerticalAlignment="Center">
-                                            <TextBlock Margin="0,5,5,0" Text="{Binding Titre}" Grid.Column="1" Style="{DynamicResource numTXTjour}"
-                                           Foreground="{DynamicResource Font}" VerticalAlignment="Top" FontSize="14"/>
+                                        <StackPanel Orientation="vertical" VerticalAlignment="Center">
+                                            <TextBlock Margin="0,5,5,0" Text="{Binding Titre}" Grid.Column="1" Style="{DynamicResource CasualTextBlock}"
+                                            VerticalAlignment="Top" FontSize="14"/>
                                             
                                                                                       
                                             <StackPanel Orientation="Horizontal">
@@ -579,12 +544,12 @@
                                                 </TextBlock>
 
 
-                                                <TextBlock Margin="5,0" Text="•" Grid.Column="1" Style="{DynamicResource numTXTjour}"
-                                           Foreground="{DynamicResource Font}" VerticalAlignment="Center" FontSize="11"/>
+                                                <TextBlock Margin="5,0" Text="•" Grid.Column="1" Style="{DynamicResource CasualTextBlock}"
+                                                VerticalAlignment="Center" FontSize="11"/>
 
 
-                                                <TextBlock Grid.Column="1" Style="{DynamicResource numTXTjour}"
-                                           Foreground="{DynamicResource Font}" VerticalAlignment="Center" FontSize="11">
+                                                <TextBlock Grid.Column="1" Style="{DynamicResource CasualTextBlock}"
+                                                VerticalAlignment="Center" FontSize="11">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="{}{0:HH:mm} - {1:HH:mm}">
                                                             <Binding Path="DateDebut"  />
@@ -597,7 +562,7 @@
                                             </StackPanel>
 
                                             <TextBlock Grid.Column="1"
-                                                      Style="{DynamicResource numTXTjour}"
+                                                      Style="{DynamicResource CasualTextBlock}"
                                            Foreground="{DynamicResource Font_Grey}" VerticalAlignment="Center" FontSize="12">
                                                 <TextBlock.Text>
                                                     <Binding Path="Fichiers" StringFormat="{}{0} fichier(s)" Converter="{StaticResource ConverterNbObj}"></Binding>
@@ -616,10 +581,9 @@
                         </ItemsControl>
 
                         <StackPanel Orientation="Horizontal" Name="NoNextEvent"  Grid.Row="1" Margin="0,5,0,30">
-                            <TextBlock Margin="0,5,5,0" Text="Aucun évènement pour les 3 prochains jours !" Grid.Column="1" Style="{DynamicResource numTXTjour}"
-                                           Foreground="{DynamicResource Font}" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="14"/>
+                            <TextBlock Margin="0,5,5,0" Text="Aucun évènement pour les 3 prochains jours !" Grid.Column="1" Style="{DynamicResource CasualTextBlock}"
+                                            VerticalAlignment="Top" TextWrapping="Wrap"/>
                             <Image Grid.Column="1" x:Name="ImgNoEvent" Source="{Binding}" VerticalAlignment="Bottom" Margin="0,0,20,15" Height="100"/>
-
                         </StackPanel>
                     </Grid>
 

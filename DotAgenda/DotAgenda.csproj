@@ -85,6 +85,8 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.DesignTools.Interaction, Version=17.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Windows.Design.Interaction, Version=4.3.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="PresentationFramework.Aero2">
       <Private>True</Private>
     </Reference>
@@ -142,6 +144,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\FileCommands.cs" />
     <Compile Include="LoginForm.xaml.cs">
       <DependentUpon>LoginForm.xaml</DependentUpon>
     </Compile>
@@ -152,9 +155,12 @@
     <Compile Include="MethodClass\GestionnaireEvent.cs" />
     <Compile Include="MethodClass\GlobalDict.cs" />
     <Compile Include="MethodClass\Primitives.cs" />
+    <Compile Include="Models\Alerte.cs" />
+    <Compile Include="Models\AlertProtocolJSON.cs" />
     <Compile Include="Models\Annee.cs" />
     <Compile Include="Models\BaseItem.cs" />
     <Compile Include="Models\Dossier.cs" />
+    <Compile Include="Models\Email.cs" />
     <Compile Include="Models\Fichier.cs" />
     <Compile Include="Models\CurrentDay.cs" />
     <Compile Include="Models\GroupEvent.cs" />
@@ -164,9 +170,17 @@
     <Compile Include="ViewModels\DialogEventViewModel.cs" />
     <Compile Include="ViewModels\DialogEventViewModel_Evenement.cs" />
     <Compile Include="ViewModels\DialogEventViewModel_Tache.cs" />
+    <Compile Include="ViewModels\MoreEventPageAdvancedViewModel.cs" />
+    <Compile Include="ViewModels\MoreEventPageUsual_ViewModel.cs" />
+    <Compile Include="ViewModels\MoreEventPageViewModel.cs" />
     <Compile Include="ViewModels\ThirdViewModel.cs" />
+    <Compile Include="View\Converter\DelaiStringToDelayType.cs" />
+    <Compile Include="View\Converter\RepeatTypeToBoolConverter.cs" />
     <Compile Include="View\Converter\InitialConverter.cs" />
     <Compile Include="View\Converter\MarginFromGap.cs" />
+    <Compile Include="View\Converter\MultipleParametersCommand.cs" />
+    <Compile Include="View\Converter\NbObjToVisibility_Less0.cs" />
+    <Compile Include="View\Converter\NbObjToVisibility_More0.cs" />
     <Compile Include="View\Converter\StartTimeConverter.cs" />
     <Compile Include="View\Converter\MarginFromDureeConverter.cs" />
     <Compile Include="View\Converter\CalendarSpeDateConverter.cs" />
@@ -177,6 +191,12 @@
     <Compile Include="View\Converter\VisibilityConverter.cs" />
     <Compile Include="View\Converter\FirstLetterUpper.cs" />
     <Compile Include="View\Converter\NbObjInArrayConverter.cs" />
+    <Compile Include="View\MoreEventPageAdvanced.xaml.cs">
+      <DependentUpon>MoreEventPageAdvanced.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MoreEventPageUsual.xaml.cs">
+      <DependentUpon>MoreEventPageUsual.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Popups\AlreadyImportedFile.xaml.cs">
       <DependentUpon>AlreadyImportedFile.xaml</DependentUpon>
     </Compile>
@@ -256,6 +276,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Ressource\BorderForFields.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Ressource\BorderDrop.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -284,7 +308,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Ressource\LabelStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Ressource\TextBoxForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\MoreEventPageAdvanced.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\MoreEventPageUsual.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -545,13 +581,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm">
-      <Version>8.1.0-preview3</Version>
+      <Version>8.2.0-preview2</Version>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.WinUI.Notifications">
       <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="DevExpress.Data">
-      <Version>22.1.6</Version>
+      <Version>23.1.2-pre-23080</Version>
+    </PackageReference>
+    <PackageReference Include="DeviceId">
+      <Version>6.3.0</Version>
     </PackageReference>
     <PackageReference Include="Emoji.Wpf">
       <Version>0.3.4</Version>
@@ -569,21 +608,21 @@
       <Version>0.9.7</Version>
     </PackageReference>
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF">
-      <Version>2.0.0-beta.700</Version>
+      <Version>2.0.0-beta.701</Version>
     </PackageReference>
     <PackageReference Include="MaterialDesignThemes">
-      <Version>4.6.1</Version>
+      <Version>4.8.1-ci218</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Maps.MapControl.WPF">
       <Version>1.0.0.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies">
-      <Version>1.0.0</Version>
+      <Version>1.0.3</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects">
-      <Version>170.8.0</Version>
+      <Version>170.13.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
       <Version>7.1.3</Version>
@@ -594,14 +633,23 @@
     <PackageReference Include="Microsoft.Windows.SDK.Contracts">
       <Version>10.0.19041.1</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
+      <Version>1.1.39</Version>
+    </PackageReference>
     <PackageReference Include="SQLite">
       <Version>3.13.0</Version>
     </PackageReference>
     <PackageReference Include="System.Data.SQLite">
       <Version>1.0.116</Version>
     </PackageReference>
+    <PackageReference Include="System.Management">
+      <Version>7.0.1</Version>
+    </PackageReference>
     <PackageReference Include="System.ValueTuple">
       <Version>4.5.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Windows.Interactivity.WPF">
+      <Version>2.0.20525</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -661,6 +709,8 @@
     <Resource Include="Img\chevrons\chevron-right_selected.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="MailTemplate\WelcomeMail\WelcomeMail.html" />
+    <Resource Include="MailTemplate\WelcomeMail\WelcomeMail.png" />
     <Resource Include="DotAgendaLogo.ico" />
     <Content Include="EmailTemplate.html" />
     <Resource Include="Img\Mail\HappyMail.png" />

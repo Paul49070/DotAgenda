@@ -18,7 +18,7 @@ namespace DotAgenda.MethodClass
 
         public CurrentDay _currentDay = new CurrentDay();
         public ObservableCollection<Dossier> ListeDossiersType;
-        public ObservableCollection<Fichier> ListeFichiers;
+        public ObservableCollection<Fichier> ListeFichiers { get; set; }
         public ObservableCollection<EventDay> ListeEventWeek;
 
         public ObservableCollection<EventDay> NextEvent { get; set; }

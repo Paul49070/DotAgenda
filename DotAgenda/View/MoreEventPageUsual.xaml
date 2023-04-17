@@ -1,0 +1,344 @@
+﻿<UserControl x:Class="DotAgenda.View.MoreEventPageUsual"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DotAgenda.View"
+        xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        mc:Ignorable="d"
+        Background="Transparent"
+             Name="MyUserControlName"
+        xmlns:viewModel="clr-namespace:DotAgenda.ViewModels"
+        xmlns:fileConverter="clr-namespace:DotAgenda.View.Converter"
+        xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+        Width="800" Height="450">
+
+    <UserControl.Resources>
+        
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="90" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="FontFamily" Value="/Font/#Poppins"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="5" Background="{DynamicResource Contrast}" BorderThickness="0,0,0,0" >
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <fileConverter:FileToColor x:Key="ConverterFileToColor"/>
+        <fileConverter:FileToIcon x:Key="ConverterFileToIcon"/>
+        <fileConverter:FileToShortName x:Key="ConverterFileToShortName"/>
+
+        <fileConverter:NbObjToVisibility_Less0 x:Key="ConverterNbObjToVisibilityLess0"/>
+        <fileConverter:NbObjToVisibility_More0 x:Key="ConverterNbObjToVisibilityMore0"/>
+        
+        <fileConverter:MultipleParametersCommand x:Key="MultipleParametersCommandConverter"/>
+
+    </UserControl.Resources>
+    <Border CornerRadius="20" BorderBrush="{DynamicResource Tertiary}" HorizontalAlignment="Stretch" BorderThickness="0">
+        <Border Background="{DynamicResource bg}" HorizontalAlignment="Stretch" Margin="-1" CornerRadius="20">
+
+                
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!--reccurences et alertes-->
+
+                <Grid Grid.Column="1" Margin="0,0,30,0">
+                    <Border x:Name="BorderEvent" Margin="15,0,0,0" Grid.Column="1"
+                                Background="Transparent"  AllowDrop="True" Drop="DropFile"
+                                CornerRadius="10" BorderThickness="0" 
+                                Style="{DynamicResource BorderDropped}">
+                        <!--
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Drop">
+                                <i:InvokeCommandAction Command="{Binding DropFileCommand}" CommandParameter="{Binding}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>-->
+
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Fichiers attachés" Margin="5,0,0,0" HorizontalAlignment="Left" FontSize="14"
+                                           VerticalAlignment="Center" Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font}"/>
+                                <Button Content="Plus" Grid.Column="1" Margin="0,0,5,2" 
+                                        Command="{Binding GetFileCommand}" CommandParameter="{Binding Path=newEvent}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+                                        Style="{DynamicResource BtnIcon}" 
+                                        FontSize="12" Height="30"/>
+                            </Grid>
+
+                            <!--pas de fichiers-->
+                            <Button     Style="{DynamicResource BasiqueBtnListHover}" 
+                                        Name="NoFile" Grid.Row="1" Background="{DynamicResource FieldColor}"
+                                        Visibility="{Binding Path=newEvent.Fichiers, Converter={StaticResource ConverterNbObjToVisibilityLess0}, UpdateSourceTrigger=PropertyChanged}"
+                                        Height="auto" Margin="0,0,0,5"
+                                        Command="{Binding GetFileCommand}" 
+                                        CommandParameter="{Binding Path=newEvent}">
+
+                                <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <wpf:PackIcon Kind="FolderOpenOutline"
+                                              HorizontalAlignment="Center" VerticalAlignment="Bottom" Foreground="{DynamicResource Font}"
+                                              Width="75" Height="75"/>
+
+
+
+                                    <StackPanel Grid.Row="1" VerticalAlignment="Top" Margin="0,10,0,0">
+                                        <TextBlock Text="Ajoutez un fichier" HorizontalAlignment="Center"
+                                           VerticalAlignment="Top" Style="{DynamicResource numTXTjour}" Foreground="{DynamicResource Font}"/>
+
+                                        <TextBlock Text="ou glissez-déposer" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" Margin="0,0,0,5" Style="{DynamicResource CasualTextBlock}" Foreground="{DynamicResource Font_Grey}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+
+                            <!--au moins 1 fichier-->
+                            <Grid x:Name="HasFile" Grid.Row="1" Visibility="{Binding Path=newEvent.Fichiers, Converter={StaticResource ConverterNbObjToVisibilityMore0}, UpdateSourceTrigger=PropertyChanged}" >
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+
+                                <ScrollViewer  x:Name="scrollviewer" Style="{DynamicResource BasicScrollViewer}"
+                                               PreviewMouseWheel="DataGrid_PreviewMouseWheel">
+
+                                    <ListView Style="{DynamicResource ListViewStyleBasic}" ItemsSource="{Binding Path=newEvent.Fichiers}">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+
+
+                                                <Button x:Name="Item" Command="{Binding DataContext.OpenFileCommand, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
+                                                        CommandParameter="{Binding}"
+                                                        Style="{DynamicResource BasiqueBtnList}"
+                                                        Background="Transparent" Padding="5"
+                                                        VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+                                                        Height="auto">
+                                                    
+                                                    <Border HorizontalAlignment="stretch" VerticalAlignment="Stretch" 
+                                                            Background="{DynamicResource FieldColor}" Margin="0" CornerRadius="6">
+
+                                                        <Grid HorizontalAlignment="stretch" Margin="5">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="auto"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <Button x:Name="CloseBTN" Grid.Column="0" Visibility="Hidden" Width="0"
+                                                                    Style="{DynamicResource BtnIcon}" Content="close" MaxHeight="18" MaxWidth="18"
+                                                                        
+                                                                    Command="{Binding DataContext.DetachFileCommand, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
+                                                                    Foreground="{DynamicResource Font}" Margin="0">
+                                                                <Button.CommandParameter>
+                                                                    <MultiBinding Converter="{StaticResource MultipleParametersCommandConverter}">
+                                                                        <Binding Path="."/>
+                                                                        <!--get the File-->
+                                                                        <Binding Path="DataContext.newEvent" ElementName="MyUserControlName" />
+                                                                    </MultiBinding>
+                                                                </Button.CommandParameter>
+                                                            </Button>
+
+
+                                                            <TextBlock Style="{DynamicResource CasualTextBlock}" Padding="10"
+                                                                       Text="{Binding Path=Nom, Converter={StaticResource ConverterFileToShortName}}"
+                                                                       TextTrimming="WordEllipsis"
+                                                                       FontSize="12" Grid.Column="1"/>
+
+
+                                                            <wpf:PackIcon Grid.Column="2" Kind="{Binding Path=Nom, Converter={StaticResource ConverterFileToIcon}}" Width="18" Height="18" 
+                                                                          HorizontalAlignment="right" Margin="0,0,10,0" x:Name="Icon"
+                                                                          Foreground="{Binding Path=Nom, Converter={StaticResource ConverterFileToColor}}" VerticalAlignment="Center" />
+
+
+                                                        </Grid>
+                                                    </Border>
+                                                </Button>
+                                                <DataTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="true">
+                                                        <Setter Property="Visibility" TargetName="CloseBTN" Value="Visible"/>
+                                                        <Setter Property="Width" TargetName="CloseBTN" Value="auto"/>
+                                                        <Setter Property="Margin" TargetName="CloseBTN" Value="5,0,0,0"/>
+                                                    </Trigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </ScrollViewer>
+
+                                <Grid Grid.Row="1" VerticalAlignment="Bottom" Margin="10,10,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid>
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Style="{DynamicResource CasualTextBlock}" Text="Trier par " Margin="0,0,5,0"/>
+                                        
+                                        <ComboBox ItemsSource="{Binding Path=OrderByList}"
+                                          SelectedItem="{Binding Path=SelectedSort, Mode=TwoWay}"
+                                          Style="{DynamicResource ComboBoxStyleFull}"
+                                          Grid.Column="1">
+                                        </ComboBox>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Background="{Binding Path=CurrentEventType.Couleur}" Name="SideBorder" Width="6" Height="auto" CornerRadius="4"
+                        Margin="0,80,0,80" HorizontalAlignment="Left"/>
+
+                    <Grid Margin="30,0,30,0" Grid.Column="1">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+
+                        <TextBox x:Name="TitreEvent" Margin="0,5,0,0" Tag="Titre" 
+                                 Text="{Binding Path=newEvent.Titre}" 
+                                 Style="{DynamicResource TextBoxForm}"/>
+                        
+
+                        <Grid Grid.RowSpan="2" Grid.Row="1" Margin="0,10,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <Label Content="Date et heure : " Style="{DynamicResource LabelDefaultStyle}"/>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <DatePicker 
+                                    Style="{DynamicResource styleDatePicker}" 
+                                    SelectedDate="{Binding Path=newEvent.DateDebut}"
+                                    CalendarStyle="{DynamicResource CalendarStylePopUp}"
+                                    Margin="0,0,5,0">
+                                </DatePicker>
+
+                                <ComboBox ItemsSource="{Binding Path=HourList}"
+                                          SelectedItem="{Binding Path=SelectedStartTime, Mode=TwoWay}"
+                                          Style="{DynamicResource ComboBoxStyleFull}"
+                                          Grid.Column="1">
+                                </ComboBox>
+
+                            </Grid>
+
+
+                            <Grid  HorizontalAlignment="Stretch" Grid.Row="2" Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <DatePicker 
+                                    Style="{DynamicResource styleDatePicker}"  
+                                    SelectedDate="{Binding Path=newEvent.DateFin}"
+                                    CalendarStyle="{DynamicResource CalendarStylePopUp}"
+                                    Margin="0,0,5,0"
+                                    Grid.Row="1">
+                                </DatePicker>
+
+
+                                <ComboBox ItemsSource="{Binding Path=HourList}"
+                                          SelectedItem="{Binding Path=SelectedEndTime, Mode=TwoWay}"
+                                          Style="{DynamicResource ComboBoxStyleFull}"
+                                          Grid.Column="1">
+                                </ComboBox>
+                            </Grid>
+
+                        </Grid>
+
+
+                        <Grid Grid.Row="3" Margin="0,10,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <Label Content="Description : " Style="{DynamicResource LabelDefaultStyle}"/>
+
+
+                            <TextBox x:Name="DescriptionTXT" Grid.Row="1" Tag="Ajouter une description..." Margin="0" Text="{Binding Path=newEvent.Description}"
+                                 Background="Transparent" TextWrapping = "Wrap" Style="{DynamicResource LongTextBoxForm}"
+                                 BorderThickness="0" Padding="5,0,5,0" FontSize="13" Foreground="{DynamicResource Font}"
+                                 HorizontalAlignment="Stretch" Cursor="IBeam" FontFamily="/Font/#Poppins"/>
+                        </Grid>
+
+                        <Grid Grid.Row="4" Margin="0,10,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <Label Content="Classe : " Style="{DynamicResource LabelDefaultStyle}"/>
+                            <ComboBox Grid.Row="1"
+                                Style="{DynamicResource ComboBoxEventtype}"
+                                ItemsSource="{Binding Path=EventTypes}"
+                                SelectedItem="{Binding Path=CurrentEventType, Mode=TwoWay}">
+                            </ComboBox>
+                        </Grid>
+
+
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+    </Border>
+</UserControl>

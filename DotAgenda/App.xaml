@@ -17,6 +17,7 @@
 
 
                 <ResourceDictionary Source="Ressource/StaticResources.xaml"/>
+                <ResourceDictionary Source="Ressource/LabelStyle.xaml"/>
                 
                 <ResourceDictionary Source="Ressource/Radio/RadioButtonMain.xaml"/>
                 <ResourceDictionary Source="Ressource/Radio/RadioButtonCheckBox.xaml"/>
@@ -27,6 +28,7 @@
                 <ResourceDictionary Source="Ressource/Radio/RadioButtonMenu.xaml"/>
                 
                 <ResourceDictionary Source="Ressource/BorderDrop.xaml"/>
+                <ResourceDictionary Source="Ressource/BorderForFields.xaml"/>
 
                 <ResourceDictionary Source="Ressource/List/ListeViewPetitJours.xaml"/>
                 <ResourceDictionary Source="Ressource/List/NumPetitsJours.xaml"/>
@@ -90,8 +92,17 @@
             <DataTemplate DataType="{x:Type viewModel:DialogEventViewModel_Evenement}">
                 <viewPopup:DialogEvent_Evenement/>
         </DataTemplate>
-            
-         
+
+            <DataTemplate DataType="{x:Type viewModel:MoreEventPageUsual_ViewModel}">
+                <view:MoreEventPageUsual/>
+            </DataTemplate>
+
+
+            <DataTemplate DataType="{x:Type viewModel:MoreEventPageAdvancedViewModel}">
+                <view:MoreEventPageAdvanced/>
+            </DataTemplate>
+
+
         </ResourceDictionary>
     </Application.Resources>
     

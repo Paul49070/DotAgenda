@@ -7,25 +7,16 @@
            x:Key="BtnImgICON">
         <Style.Setters>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"  CornerRadius="10">
-                            <Grid HorizontalAlignment="stretch" VerticalAlignment="Stretch">
+                        <Border Background="{TemplateBinding Background}" Grid.Column="1"  CornerRadius="10">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition Width="100"/>
                                 </Grid.ColumnDefinitions>
-
-                                <Border Background="Transparent" Grid.Column="1"  CornerRadius="10">
-                                    <wpf:PackIcon HorizontalAlignment="Center" VerticalAlignment="Center" Kind="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}" Width="26" Height="26" Foreground="{TemplateBinding Foreground}" />
-                                </Border>
-
-                                <TextBlock Grid.Column="2" Background="Transparent" HorizontalAlignment="Stretch" 
-                                       Text="{TemplateBinding Tag}" FontSize="15" Foreground="{TemplateBinding Foreground}" 
-                                       VerticalAlignment="Center" FontFamily="/Font/#Poppins" Margin="5,0,7,0"/>
-
+                                <wpf:PackIcon HorizontalAlignment="Center" VerticalAlignment="Center" Kind="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}" Width="26" Height="26" Foreground="{TemplateBinding Foreground}" />
                             </Grid>
                         </Border>
                     </ControlTemplate>

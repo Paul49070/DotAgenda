@@ -111,7 +111,7 @@ namespace DotAgenda.MethodClass.DataBaseMethods
                             Fichier f = DataBaseFile._dbFile.GetFileWithID(ID_file);
 
                             if (e.Titre != null && f.Nom != null)
-                                e.AddFile(f);
+                                e.AttachFile(f);
                         }
                     }
                 }

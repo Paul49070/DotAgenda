@@ -100,11 +100,12 @@
            x:Key="BasiqueBtnListHover">
         <Style.Setters>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="{DynamicResource OpacityPopupBG}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Grid HorizontalAlignment="stretch" VerticalAlignment="Stretch">
-                            <Border Background="{DynamicResource OpacityPopupBG}" CornerRadius="20" Name="bd" HorizontalAlignment="Stretch" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Transparent">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="10" Name="bd" HorizontalAlignment="Stretch" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Transparent">
                                 <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                             </Border>
                         </Grid>
