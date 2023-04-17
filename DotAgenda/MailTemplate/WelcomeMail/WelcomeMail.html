@@ -1,171 +1,52 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title></title>
-	<meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
-	<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
-		@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+  <head>
+    <title></title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  </head>
 
-		body {
-			justify-content: center;
-			color: #000000;
-			width: 200px;
-			font-family: 'Poppins', sans-serif;
-		}
+  <body style="margin-left: auto;margin-right: auto;justify-content:center;max-width: 700px;color:#000000;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif, sans-serif;">
+    <table border="0" cellspacing="0" width=100% cellpadding="0" style="margin-left: auto;margin-right: auto;box-sizing:border-box;border-collapse:collapse;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif, sans-serif;">
+      <tr style="height:auto;">
+        <td style="padding-top: 0px;">
+          <div class="main-content" style="margin-left:auto;margin-right:auto;padding:20px;background-color:#B4B6B9;border-radius: 10px;">
+            <div class="header" style="margin-left:auto;margin-right:auto;padding-bottom:30px;font-size:16px;letter-spacing:1px;padding-left:0px; align-items: center;">
+              <img src="https://lh3.googleusercontent.com/pw/AJFCJaU-BKNoVdzEGccvFaXQ5aSFHtJOs3GM1mPE3GEIJOvZvvtQt8eLW7tu374_9AhYyY73G8BiuwdNLDQdPEAlodq9t4j4RnKhPBxU1hBMpyFkS8n7gOWpWCoWGWCHvvjL-CsP2c3xMAQN788WKojk-XFdCg=w256-h256-s-no?authuser=0" class="logo" width="50" alt="Logo" style="float:left;margin-right:20px;margin-top:0px;"/>
+              <img src="http://cdn.mcauto-images-production.sendgrid.net/e336ef7aa2328c4f/f9135801-c77c-468f-9eb3-de4284dfaa1a/805x207.png" class="brand" width="125" height="31" alt=".agenda" style="margin-right:20px;vertical-align:middle;margin-top:0px;margin-left: 0px; padding-top: 10px;"/>
+            </div>
 
-		h1 {
-			text-align: center;
-			font-size: 30px;
-            color: #000000;
-            font-family: 'Poppins', sans-serif;
-		}
+			<!--Partie indépendante : -->
 
-		h2 {
-			margin-top: 0;
-			text-align: center;
-			font-size: 40px;
-            color: #000000;
-            font-family: 'Poppins', sans-serif;
-		}
+            <div class="event" style="text-align: center;margin-left:auto;margin-right:auto;border-radius: 10px;padding:25px;background-color:#ffffff;box-shadow:0 2px 4px rgba(0,0,0,0.3);">
+              <div style="margin-left:auto;margin-right:auto;word-break: break-word;">
+                <h2 style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif, sans-serif;font-size:32px;color:#000000;font-weight:0;letter-spacing:1px;margin-left: auto;margin-right: auto;">Hey, 
+                  <span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif, sans-serif;font-size:26px;color:#000000;margin-left:auto;font-weight:0;letter-spacing:1px;color: #573fff;">.</span>{PRENOM}</h2>
+              <h2 style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif, sans-serif;font-size:26px;color:#000000;font-weight:0;letter-spacing:1px;padding-top: 0px;">Ravis de te rencontrer ! </h2>
+			  <img src="http://cdn.mcauto-images-production.sendgrid.net/e336ef7aa2328c4f/107054d7-1b9d-487f-b3b4-282207d97786/1001x688.png"  alt=".agenda happyImage" style="margin-top: 20px; margin-bottom: 20px;" width="300"/>
 
-		.verifCode {
-			margin-left: 30px;
-			margin-top: 50px;
-			margin-bottom: 100px;
-			text-align: center;
-			font-size: 35px;
-			letter-spacing: 25px;
-            color: #000000;
-            font-family: 'Poppins', sans-serif;
-		}
+              <div class="details" style="padding-bottom:20px;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif, sans-serif;border-radius: 5%;font-size:16px; font-weight:0;color:#888888;line-height:1.5;">
+                <p style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif, sans-serif;">                    Bienvenue sur DotAgenda ! Nous sommes là pour t'aider à organiser tes journées et tes projets, nous avons hâte de commencer ! 
+				</p>
+              </div>
+			  <h1>Ton code : </h1>
+			  <h2 style="letter-spacing: 2px;">{VERIFICATIONCODE}</h2>
+              </div>
+            </div>
 
-		h3 {
-			font-size: 25px;
-            color: #000000;
-            font-family: 'Poppins', sans-serif;
-		}
+			<!--Fin partie indépendante-->
 
-		.dot {
-			display: inline-block;
-			text-align: left;
-			color: #573fff;
-			font-weight:bolder;
-			font-size: 30px;
-			margin: 0;
-            font-family: 'Poppins', sans-serif;
-		}
+            <div class="footer" style="background-color:#F5F5F5;margin-top:10px;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif, sans-serif;
+            box-shadow:0 2px 4px rgba(0,0,0,0.3);border-radius:10px;justify-content:left;padding:20px;padding-left:0px;color:#88898C;font-size:16px;letter-spacing:1px;padding-left:25px;padding-top:40px;">
+              <img src="http://cdn.mcauto-images-production.sendgrid.net/e336ef7aa2328c4f/c1c5c16d-ce93-4c7e-a838-1dc5a0f4b83c/805x207.png" alt=".agenda" class="brandgray" width="100" style="margin-left:0px;"/>
+              <p style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif, sans-serif;font-weight:0;color:#88898C;">Gardez votre journée organisée !</p>
+              <p class="mail" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif, sans-serif;font-weight:0;text-decoration:none;margin-top:0px;font-size:14px;color:#88898C;">dotagendacontact1@gmail.com</p>
+            </div>
+          </div>
 
-		table {
-			box-sizing: border-box;
-			width: 50%;
-			border-collapse: collapse;
-			margin: auto;
-            font-family: 'Poppins', sans-serif;
-		}
+        </td>
 
-		tr {
-			height: auto;
-		}
-
-		img {
-			margin-top: 100px;
-			margin-bottom: 50px;
-		}
-
-		.logo {
-			margin-top: 0;
-			margin-bottom: 50px;
-		}
-
-		.DotAgendaRow {
-			border-bottom: 3px solid lightgray;
-		}
-
-		.DotAgendaTitre {
-			text-align: left;
-			font-weight: bolder;
-			font-size: 30px;
-            color: #000000;
-            font-family: 'Poppins', sans-serif;
-		}
-
-		.corps {
-			text-align: center;
-			font-size: 20px;
-            color: #000000;
-		}
-
-		.corpsFoot {
-			text-align: center;
-			font-size: 20px;
-			margin-top: 50px;
-            color: #000000;
-            font-family: 'Poppins', sans-serif;
-		}
-
-		tfoot {
-			margin-bottom: 0;
-			padding: 20%;
-            font-family: 'Poppins', sans-serif;
-		}
-
-		.hey {
-			margin-top: 60px;
-			color: #573fff;
-            font-family: 'Poppins', sans-serif;
-
-		}
-
-	</style>
-</head>
-
-    <body>
-	<table>
-		<thead class="DotAgendaRow">
-			<td width="auto">        
-				<h1 class="DotAgendaTitre"><p class="dot">.</p>agenda</h1>
-			</td>
-		</thead>
-		<tr>
-			<td>
-				<h1 class="hey" id="Prenom">Hey, {FIRSTNAME} !</h1>
-				<h2>Ravis de te rencontrer !</h2>
-			</td>
-		</tr>
-		<tr class="ImgRow">
-			<td width="auto" align="center">     
-                <img src=cid:WelcomeMail alt="happyImage" id="ImageMail" width="300">
-            </td>
-        </tr>   
-
-        <tr>
-            <td>
-                <p class="corps">
-                    Bienvenue sur DotAgenda ! Nous sommes là pour t'aider à organiser tes journées et tes projets, nous avons hâte de commencer ! 
-                </p>
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <h1>Ton code : </h1>
-                <h2 class="verifCode">{VERIFICATIONCODE}</h2>
-            </td>
-        </tr>
-
-        <tfoot>
-            <tr >
-                <td align="center">
-                    <img src=cid:LogoMail class="logo" id="logoImage" width="60" alt="My Image">
-                </td>
-            </tr>
-        </tfoot>
-
-    
+      </tr>
     </table>
-	
-
-    </body>
+  </body>
 </html>

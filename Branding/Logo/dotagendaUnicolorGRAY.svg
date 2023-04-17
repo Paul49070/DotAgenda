@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="805"
+   height="207"
+   viewBox="0 0 212.98965 54.768791"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="dotagendaUnicolorGRAY.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   inkscape:export-filename="dotagendaUnicolorGRAY.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="350.5"
+     inkscape:cy="-5"
+     inkscape:window-width="1536"
+     inkscape:window-height="793"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <rect
+       x="97.492661"
+       y="241.02353"
+       width="885.16376"
+       height="370.68719"
+       id="rect113" />
+  </defs>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-26.363765,-70.354839)"
+       id="text111"
+       style="font-size:192px;white-space:pre;shape-inside:url(#rect113);display:inline;fill:#000000;image-rendering:auto"><tspan
+         x="97.492188"
+         y="416.19086"
+         id="tspan7765"><tspan
+           style="font-weight:500;font-family:Poppins;-inkscape-font-specification:'Poppins Medium';fill:#88898c"
+           id="tspan7763">.agenda</tspan></tspan></text>
+  </g>
+</svg>

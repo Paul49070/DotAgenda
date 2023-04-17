@@ -145,7 +145,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Core\FileCommands.cs" />
-    <Compile Include="LoginForm.xaml.cs">
+    <Compile Include="View\LoginView\LoginForm.xaml.cs">
       <DependentUpon>LoginForm.xaml</DependentUpon>
     </Compile>
     <Compile Include="MethodClass\DataBaseMethods\DataBase.cs" />
@@ -191,6 +191,9 @@
     <Compile Include="View\Converter\VisibilityConverter.cs" />
     <Compile Include="View\Converter\FirstLetterUpper.cs" />
     <Compile Include="View\Converter\NbObjInArrayConverter.cs" />
+    <Compile Include="View\LoginView\RegisterView.xaml.cs">
+      <DependentUpon>RegisterView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\MoreEventPageAdvanced.xaml.cs">
       <DependentUpon>MoreEventPageAdvanced.xaml</DependentUpon>
     </Compile>
@@ -204,9 +207,6 @@
     <Compile Include="View\Converter\ConverterDateCal.cs" />
     <Compile Include="Core\ObservableObject.cs" />
     <Compile Include="Core\RelayCommand.cs" />
-    <Compile Include="DIalogModifEvent.xaml.cs">
-      <DependentUpon>DIalogModifEvent.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\Popups\AreYouSureDelete.xaml.cs">
       <DependentUpon>AreYouSureDelete.xaml</DependentUpon>
     </Compile>
@@ -256,11 +256,7 @@
     <Compile Include="View\ThirdView.xaml.cs">
       <DependentUpon>ThirdView.xaml</DependentUpon>
     </Compile>
-    <Page Include="DIalogModifEvent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="LoginForm.xaml">
+    <Page Include="View\LoginView\LoginForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -315,6 +311,10 @@
     <Page Include="Ressource\TextBoxForm.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LoginView\RegisterView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\MoreEventPageAdvanced.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -494,6 +494,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Resource Include="Font\Poppins-Regular.ttf" />
+    <None Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -532,18 +535,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Img\smile.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icon1.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="LogoV2.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="cbac9abfc6464078bd58d465158df1b3-_1_.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="cbac9abfc6464078bd58d465158df1b3-_1_ %281%29.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Img\ContextMenuIcons\edit.png" />
@@ -595,6 +586,15 @@
     <PackageReference Include="Emoji.Wpf">
       <Version>0.3.4</Version>
     </PackageReference>
+    <PackageReference Include="FirebaseAdmin">
+      <Version>2.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="FirebaseAuthentication.net">
+      <Version>3.7.2</Version>
+    </PackageReference>
+    <PackageReference Include="FirebaseDatabase.net">
+      <Version>4.2.0</Version>
+    </PackageReference>
     <PackageReference Include="LiveCharts.Core">
       <Version>0.9.8</Version>
     </PackageReference>
@@ -612,6 +612,9 @@
     </PackageReference>
     <PackageReference Include="MaterialDesignThemes">
       <Version>4.8.1-ci218</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting">
+      <Version>8.0.0-preview.3.23174.8</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Maps.MapControl.WPF">
       <Version>1.0.0.3</Version>
@@ -709,12 +712,14 @@
     <Resource Include="Img\chevrons\chevron-right_selected.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Img\DotAgendaLogo.png" />
     <Content Include="MailTemplate\WelcomeMail\WelcomeMail.html" />
     <Resource Include="MailTemplate\WelcomeMail\WelcomeMail.png" />
     <Resource Include="DotAgendaLogo.ico" />
-    <Content Include="EmailTemplate.html" />
     <Resource Include="Img\Mail\HappyMail.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ViewModels\LoginViewModel\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

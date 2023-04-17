@@ -205,12 +205,12 @@
         <Setter Property="Cursor" Value="IBeam"/>
         <Setter Property="AllowDrop" Value="False"/>
         <Setter Property="Foreground" Value="{DynamicResource Font}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource Tertiary}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type PasswordBox}">
-                    <Border BorderBrush="{TemplateBinding BorderBrush}" HorizontalAlignment="Stretch" BorderThickness="0,0,0,2" CornerRadius="5">
+                    <Border Style="{DynamicResource BorderForFields}" BorderBrush="{TemplateBinding BorderBrush}" Padding="12">
                             <TextBox
                                      Foreground="{TemplateBinding Foreground}"
                                      FontFamily="/Font/#Poppins"

@@ -10,7 +10,14 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using DotAgenda.View.LoginView;
 using System.Windows.Media.Media3D;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.SqlServer.Management.Smo.RegSvrEnum;
+using Firebase.Auth;
+using System.Runtime.Remoting.Contexts;
 
 namespace DotAgenda
 {
@@ -33,11 +40,44 @@ namespace DotAgenda
         };
 
         public static string SystemDB_Path { get; } = "DataSource =SystemDB.db";
+        private string firebaseApiKey = "AIzaSyCJCh7vVADmIMbrql8EF8RZ0W0XHAFp_r4";
 
         GestionnaireEvent _global;
+
+        private readonly IHost _host;
+
+
+        public App()
+        {
+            Console.WriteLine("ok");
+
+            _host = Host
+                .CreateDefaultBuilder()
+                .ConfigureServices((context, service) =>
+                {
+                    service.AddSingleton(new FirebaseAuthProvider(new FirebaseConfig(firebaseApiKey)));
+
+                    service.AddSingleton<MainWindow>((services) => new MainWindow());
+                })
+                .Build();
+        }
+
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            MainWindow = _host.Services.GetRequiredService<MainWindow>();
+            MainWindow.Show();
+
+            FirebaseAuthProvider firebaseAuthProvider = _host.Services.GetRequiredService<FirebaseAuthProvider>();
+            firebaseAuthProvider.CreateUserWithEmailAndPasswordAsync("paul@gmail.com", "Test123!");
+            base.OnStartup(e);
+        }
+
         private void ApplicationStart(object sender, StartupEventArgs e)
         {
             Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+            new Email("Paul", "", "JDJZAJI");
 
             if (!RememberConnection())
             {

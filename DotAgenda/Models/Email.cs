@@ -30,10 +30,11 @@ namespace DotAgenda.Models
 
         public Email(string prenom, string mailAdr, string generatedCode, string subject = "Création de compte .agenda !")
         {
-            GetServer(mailAdr);
+            //GetServer(mailAdr);
 
             MailAddress from = new MailAddress("DotAgendaContact1@gmail.com");
-            MailAddress to = new MailAddress(mailAdr);
+            //MailAddress to = new MailAddress(mailAdr);
+            MailAddress to = new MailAddress("paul.lemonnier70@gmail.fr");
 
             MailMessage message = new MailMessage(from, to);
             message.Subject = subject;
@@ -49,36 +50,14 @@ namespace DotAgenda.Models
                 Body = File.ReadAllText(templatePath);
             }
 
-            Body = Body.Replace("{FIRSTNAME}", prenom);
+            Body = Body.Replace("{PRENOM}", prenom);
             Body = Body.Replace("{VERIFICATIONCODE}", generatedCode);
 
             message.IsBodyHtml = true;
 
             AlternateView htmlView = AlternateView.CreateAlternateViewFromString(Body, null, MediaTypeNames.Text.Html);
-
-            string welcomeImage = Path.Combine(absolutePath, "WelcomeMail.png");
-
-
-            LinkedResource mailImage = new LinkedResource(welcomeImage, "image/png");
-            mailImage.ContentId = "WelcomeMail";
-
-            htmlView.LinkedResources.Add(mailImage);
-
-            string logoImagetemp = Path.Combine(absolutePath, "DotAgendaLogo.png");
-            LinkedResource logoImage = new LinkedResource(logoImagetemp, "image/png");
-            logoImage.ContentId = "LogoMail";
-
-            htmlView.LinkedResources.Add(logoImage);
             
             message.AlternateViews.Add(htmlView);
-            //message.Body = @"Bienvenue ! Ton compte à bien été créer. Au plaisir d'organiser ton planning ensemble !";
-
-
-            foreach (Attachment attachment in message.Attachments)
-            {
-
-                    message.Attachments.Remove(attachment);
-            }
 
             var smtpClient = new SmtpClient("smtp.gmail.com")
             {
@@ -97,6 +76,11 @@ namespace DotAgenda.Models
             {
                 MessageBox.Show("Impossible d'envoyer le mail de confirmation !", "Error", MessageBoxButton.OK);
             }
+        }
+
+        public static void Send()
+        {
+
         }
     }
 }

@@ -84,8 +84,6 @@ namespace DotAgenda
             SearchBox.LostFocus += SearchBox_LostFocus;
             SearchBox.GotFocus += SearchBox_GotFocus;
             SearchBarItems.ItemsSource= FilteredEventSearch;
-
-            
         }       
 
         public void AddEvent(object sender, RoutedEventArgs eventArgs)
@@ -181,7 +179,7 @@ namespace DotAgenda
 
         private void Search_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var box = sender as TextBox;
+            /*var box = sender as TextBox;
             string text = box.Text;
 
             FilteredEventSearch.Clear();
@@ -216,7 +214,7 @@ namespace DotAgenda
                         }
                     }
                  }
-             }
+             }*/
          }
 
         private void SearchClick(object sender, RoutedEventArgs e)

@@ -129,6 +129,47 @@ namespace DotAgenda.Models
             }
         }
 
+        [JsonProperty("email")]
+
+        private string _Email;
+        public string Email
+        {
+            get { return _Email; }
+            set
+            {
+                if (value != _Email)
+                    _Email = value;
+            }
+        }
+
+
+        [JsonProperty("prenom")]
+
+        private string _Prenom;
+        public string Prenom
+        {
+            get { return _Prenom; }
+            set
+            {
+                if (value != _Prenom)
+                    _Prenom = value;
+            }
+        }
+
+
+        [JsonProperty("nom")]
+
+        private string _Nom;
+        public string Nom
+        {
+            get { return _Nom; }
+            set
+            {
+                if (value != _Nom)
+                    _Nom = value;
+            }
+        }
+
 
         public AlertProtocolJSON(Alerte a, string Type)
         {
@@ -144,7 +185,6 @@ namespace DotAgenda.Models
 
             if (a.MoyenEnvoi == Alerte.TypeMoyenEnvoie.Both)
             {
-                Console.WriteLine("Both");
                 this.Mail = true; this.Notif = true;
             }
             else if (a.MoyenEnvoi == Alerte.TypeMoyenEnvoie.Notification)
@@ -156,6 +196,10 @@ namespace DotAgenda.Models
             {
                 this.Mail = true; this.Notif = false;
             }
+
+            this.Email = App.User.Mail;
+            this.Prenom = App.User.Prenom;
+            this.Nom = App.User.Nom;
         }
     }
 }

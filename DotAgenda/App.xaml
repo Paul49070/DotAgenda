@@ -4,8 +4,7 @@
              xmlns:local="clr-namespace:DotAgenda"
              xmlns:viewModel="clr-namespace:DotAgenda.ViewModels"
              xmlns:view="clr-namespace:DotAgenda.View"
-             xmlns:viewPopup="clr-namespace:DotAgenda.View.Popups"
-             Startup="ApplicationStart">
+             xmlns:viewPopup="clr-namespace:DotAgenda.View.Popups">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

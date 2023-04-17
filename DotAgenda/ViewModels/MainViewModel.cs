@@ -29,12 +29,12 @@ namespace DotAgenda.ViewModels
 
         public MainViewModel()
         {
-            currentUser = App.User;
+            //currentUser = App.User;
 
             HomeVM = new HomeViewModel();
             SecondVM = new SecondViewModel();
             ThirdVM = new ThirdViewModel();
-            CurrentView = HomeVM;
+            CurrentView = null;
 
             HomeViewCommand = new RelayCommand(o => { CurrentView = HomeVM;});
 
